@@ -103,6 +103,14 @@ const typeDataLg = { ...typeData, fontSize: 24, fontWeight: 600, letterSpacing: 
 const typeDataMd = { ...typeData, fontSize: 16, fontWeight: 600 };
 const typeDataSm = { ...typeData, fontSize: 11, color: C.slate };
 const typeDataAmber = { ...typeData, fontSize: 20, fontWeight: 600, color: C.amber };
+const typePrice = {
+  fontFamily: C.mono,
+  fontSize: 20,
+  fontWeight: 600,
+  color: "#0F172A",
+  letterSpacing: "-0.025em",
+  fontVariantNumeric: "tabular-nums",
+};
 
 const primaryBtn = {
   flex: 1,
@@ -1096,7 +1104,7 @@ function CreatorSign({ agreement, onNext, t }) {
           </div>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
             <Label>Price:</Label>
-            <span style={{ ...typeDataMd, color: C.green }}>
+            <span className="text-slate-900 font-mono text-xl tracking-tight" style={typePrice}>
               {agreement.currency}{Number(agreement.price).toLocaleString("en-IN")}
             </span>
           </div>
@@ -1408,7 +1416,7 @@ function ClientView({ agreement, creatorSig, token, changeOrders = [], onSign, o
                 {agreement.projectTitle}
               </div>
             </div>
-            <div style={{ ...typeDataLg, color: C.green, flexShrink: 0 }}>
+            <div className="text-slate-900 font-mono text-xl tracking-tight" style={{ ...typePrice, flexShrink: 0 }}>
               {agreement.currency}
               {Number(agreement.price).toLocaleString("en-IN")}
             </div>
@@ -1459,7 +1467,7 @@ function ClientView({ agreement, creatorSig, token, changeOrders = [], onSign, o
             {changeOrders.map((co, idx) => (
               <div key={idx} style={{ marginBottom: idx < changeOrders.length - 1 ? 24 : 0, paddingBottom: idx < changeOrders.length - 1 ? 24 : 0, borderBottom: idx < changeOrders.length - 1 ? `1px solid ${C.divider}` : "none" }}>
                 <div style={{ ...typeBodyStrong, fontSize: 15, marginBottom: 8 }}>{co.description}</div>
-                {co.extraPrice && <div style={{ ...typeDataMd, color: C.green, marginBottom: 12 }}>+ {agreement.currency}{Number(co.extraPrice).toLocaleString("en-IN")}</div>}
+                {co.extraPrice && <div className="text-slate-900 font-mono text-xl tracking-tight" style={{ ...typePrice, marginBottom: 12 }}>+ {agreement.currency}{Number(co.extraPrice).toLocaleString("en-IN")}</div>}
                 <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
                   <div style={{ flex: 1 }}>
                     <Label>Provider</Label>
@@ -1489,7 +1497,7 @@ function ClientView({ agreement, creatorSig, token, changeOrders = [], onSign, o
         {agreement.upiId && Number(agreement.advanceAmount) > 0 && (
           <div style={{ background: C.card, borderRadius: 16, padding: 20, marginBottom: 24, border: `1px solid ${C.border}`, boxShadow: C.shadowLg }}>
             <div style={{ ...typeHeadingSm, marginBottom: 12 }}>
-              Pay <span style={typeDataMd}>{agreement.currency}{Number(agreement.advanceAmount).toLocaleString("en-IN")}</span> advance before signing
+              Pay <span className="text-slate-900 font-mono text-xl tracking-tight" style={typePrice}>{agreement.currency}{Number(agreement.advanceAmount).toLocaleString("en-IN")}</span> advance before signing
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={handlePayUPI} style={{ ...confirmBtn, flex: 1, padding: "14px" }}>Pay Advance →</button>
@@ -1769,7 +1777,8 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
               >
                 <span style={typeLabel}>{label}</span>
                 <span
-                  style={highlight ? { ...typeDataLg, color: C.navy, textAlign: "right" } : { ...typeBodyStrong, textAlign: "right" }}
+                  className={highlight ? "text-slate-900 font-mono text-xl tracking-tight" : ""}
+                  style={highlight ? { ...typePrice, textAlign: "right" } : { ...typeBodyStrong, textAlign: "right" }}
                 >
                   {value}
                 </span>
@@ -1884,11 +1893,11 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
           <div style={{ background: C.card, borderRadius: 16, padding: 24, marginBottom: 16, border: `1px solid ${C.border}` }}>
             <Label>Payment Status</Label>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, ...typeBody }}>
-              <span>Advance: <span style={typeDataMd}>{agreement.currency}{Number(agreement.advanceAmount).toLocaleString("en-IN")}</span></span>
+              <span>Advance: <span className="text-slate-900 font-mono text-xl tracking-tight" style={typePrice}>{agreement.currency}{Number(agreement.advanceAmount).toLocaleString("en-IN")}</span></span>
               <span style={{ fontWeight: 600, color: isPaidAdvance ? C.green : C.navyMid }}>{isPaidAdvance ? "Paid ✓" : "Pending"}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16, ...typeBody }}>
-              <span>Final: <span style={typeDataMd}>{agreement.currency}{(Number(agreement.price) - Number(agreement.advanceAmount)).toLocaleString("en-IN")}</span></span>
+              <span>Final: <span className="text-slate-900 font-mono text-xl tracking-tight" style={typePrice}>{agreement.currency}{(Number(agreement.price) - Number(agreement.advanceAmount)).toLocaleString("en-IN")}</span></span>
               <span style={{ fontWeight: 600, color: C.muted }}>Pending</span>
             </div>
             {!isPaidAdvance && (
@@ -1906,7 +1915,7 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
             {changeOrders.map((co, idx) => (
               <div key={idx} style={{ marginBottom: idx < changeOrders.length - 1 ? 24 : 0, paddingBottom: idx < changeOrders.length - 1 ? 24 : 0, borderBottom: idx < changeOrders.length - 1 ? `1px solid ${C.divider}` : "none" }}>
                 <div style={{ ...typeBodyStrong, fontSize: 15, marginBottom: 8 }}>{co.description}</div>
-                {co.extraPrice && <div style={{ ...typeDataMd, color: C.green, marginBottom: 12 }}>+ {agreement.currency}{Number(co.extraPrice).toLocaleString("en-IN")}</div>}
+                {co.extraPrice && <div className="text-slate-900 font-mono text-xl tracking-tight" style={{ ...typePrice, marginBottom: 12 }}>+ {agreement.currency}{Number(co.extraPrice).toLocaleString("en-IN")}</div>}
                 <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
                   <div style={{ flex: 1 }}>
                     <Label>Provider</Label>
@@ -1992,16 +2001,18 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
         {!isPaid ? (
           <div
             style={{
-              background: C.navy,
+              background: C.card,
               borderRadius: 16,
               padding: 24,
               marginBottom: 16,
+              border: `1.5px solid ${C.border}`,
+              boxShadow: C.shadowSm,
             }}
           >
             <div
               style={{
                 ...typeHeading,
-                color: "#FFFFFF",
+                color: C.ink,
                 marginBottom: 8,
               }}
             >
@@ -2010,7 +2021,7 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
             <div
               style={{
                 ...typeBody,
-                color: "rgba(255,255,255,0.7)",
+                color: C.muted,
                 marginBottom: 18,
               }}
             >
@@ -2027,13 +2038,14 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
             >
               <div>
                 <span
-                  style={{ ...typeDataLg, color: "#FFFFFF" }}
+                  className="text-slate-900 font-mono text-xl tracking-tight"
+                  style={typePrice}
                 >
                   ₹49
                 </span>
                 <span
                   style={{
-                    color: "rgba(255,255,255,0.5)",
+                    color: C.muted,
                     fontSize: 13,
                     marginLeft: 8,
                     fontFamily: C.sans,
@@ -2221,7 +2233,7 @@ function Payment({ agreement, token, onSuccess, onBack }) {
                 {token}
               </div>
             </div>
-            <div style={typeDataLg}>
+            <div className="text-slate-900 font-mono text-xl tracking-tight" style={typePrice}>
               ₹49
             </div>
           </div>
@@ -2411,7 +2423,7 @@ function Dashboard({ onBack, onOpenDeal }) {
                 <div style={{ ...typeBodyStrong, marginBottom: 4 }}>{deal.projectTitle}</div>
                 <div style={{ ...typeBody, fontSize: 13, marginBottom: 8 }}>{deal.clientName}</div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                  <div style={{ ...typeDataMd, color: C.green }}>{deal.currency}{Number(deal.price).toLocaleString("en-IN")}</div>
+                  <div className="text-slate-900 font-mono text-xl tracking-tight" style={typePrice}>{deal.currency}{Number(deal.price).toLocaleString("en-IN")}</div>
                   <div style={{ ...typeLabel, padding: "4px 8px", borderRadius: 12, ...({
                     pending: { background: C.amberLight, color: C.amberDark },
                     signed: { background: C.greenLight, color: C.greenText },
