@@ -99,7 +99,7 @@ const typeData = {
   lineHeight: 1.4,
   color: C.ink,
 };
-const typeDataLg = { ...typeData, fontSize: 24, fontWeight: 600, letterSpacing: "-0.3px" };
+const typeDataLg = { ...typeData, fontSize: 24, fontWeight: 600, letterSpacing: "-0.3px", fontVariantNumeric: "tabular-nums" };
 const typeDataMd = { ...typeData, fontSize: 16, fontWeight: 600 };
 const typeDataSm = { ...typeData, fontSize: 11, color: C.slate };
 const typeDataAmber = { ...typeData, fontSize: 20, fontWeight: 600, color: C.amber };
@@ -174,12 +174,31 @@ const inputStyle = {
 // ─── UTILITIES ────────────────────────────────────────────────────────────────
 function makeHash(obj) {
   const str = JSON.stringify(obj);
-  let h = 0x811c9dc5 >>> 0;
+  // FNV-1a hash to generate a seed
+  let h = 2166136261 >>> 0;
   for (let i = 0; i < str.length; i++) {
     h ^= str.charCodeAt(i);
-    h = Math.imul(h, 0x01000193) >>> 0;
+    h = Math.imul(h, 16777619) >>> 0;
   }
-  return h.toString(16).toUpperCase().padStart(8, "0");
+  
+  // Mulberry32 deterministic PRNG seeded by h
+  let state = h;
+  const nextRandomHex = () => {
+    state = (state + 0x9e3779b9) | 0;
+    let z = state;
+    z ^= z >>> 16;
+    z = Math.imul(z, 0x21f0aa7c);
+    z ^= z >>> 15;
+    z = Math.imul(z, 0x735a2d97);
+    z ^= z >>> 15;
+    return (z >>> 0).toString(16).padStart(8, "0");
+  };
+  
+  let result = "";
+  for (let i = 0; i < 8; i++) {
+    result += nextRandomHex();
+  }
+  return result.toLowerCase();
 }
 
 function genToken() {
@@ -304,6 +323,7 @@ function SignaturePad({ onSave, height = 150 }) {
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
   const drawing = useRef(false);
+  const pointsRef = useRef([]);
   const [hasMark, setHasMark] = useState(false);
 
   useEffect(() => {
@@ -317,7 +337,7 @@ function SignaturePad({ onSave, height = 150 }) {
       const c = canvas.getContext("2d");
       c.scale(dpr, dpr);
       c.strokeStyle = C.ink;
-      c.lineWidth = 2.5;
+      c.lineWidth = 4.0;
       c.lineCap = "round";
       c.lineJoin = "round";
       ctxRef.current = c;
@@ -345,6 +365,7 @@ function SignaturePad({ onSave, height = 150 }) {
       const c = ctxRef.current;
       if (!c) return;
       const { x, y } = getXY(e);
+      pointsRef.current = [{ x, y }];
       c.beginPath();
       c.moveTo(x, y);
     },
@@ -355,8 +376,27 @@ function SignaturePad({ onSave, height = 150 }) {
     (e) => {
       if (!drawing.current || !ctxRef.current) return;
       const { x, y } = getXY(e);
-      ctxRef.current.lineTo(x, y);
-      ctxRef.current.stroke();
+      pointsRef.current.push({ x, y });
+
+      const points = pointsRef.current;
+      if (points.length < 2) return;
+
+      const c = ctxRef.current;
+      const p1 = points[points.length - 2];
+      const p2 = points[points.length - 1];
+      const midPoint = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+
+      c.beginPath();
+      if (points.length === 2) {
+        c.moveTo(p1.x, p1.y);
+        c.lineTo(midPoint.x, midPoint.y);
+      } else {
+        const p0 = points[points.length - 3];
+        const prevMidPoint = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 };
+        c.moveTo(prevMidPoint.x, prevMidPoint.y);
+        c.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+      }
+      c.stroke();
       setHasMark(true);
     },
     [getXY]
@@ -364,6 +404,17 @@ function SignaturePad({ onSave, height = 150 }) {
 
   const onUp = useCallback(() => {
     drawing.current = false;
+    const points = pointsRef.current;
+    const c = ctxRef.current;
+    if (points.length >= 2 && c) {
+      const pLast = points[points.length - 1];
+      const pPenultimate = points[points.length - 2];
+      const midPoint = { x: (pPenultimate.x + pLast.x) / 2, y: (pLast.y + pPenultimate.y) / 2 };
+      c.beginPath();
+      c.moveTo(midPoint.x, midPoint.y);
+      c.lineTo(pLast.x, pLast.y);
+      c.stroke();
+    }
   }, []);
 
   const clear = () => {
@@ -371,6 +422,7 @@ function SignaturePad({ onSave, height = 150 }) {
     const c = ctxRef.current;
     if (!c) return;
     c.clearRect(0, 0, canvas.width, canvas.height);
+    pointsRef.current = [];
     setHasMark(false);
   };
 
@@ -1717,7 +1769,7 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
               >
                 <span style={typeLabel}>{label}</span>
                 <span
-                  style={highlight ? { ...typeDataLg, color: C.green, textAlign: "right" } : { ...typeBodyStrong, textAlign: "right" }}
+                  style={highlight ? { ...typeDataLg, color: C.navy, textAlign: "right" } : { ...typeBodyStrong, textAlign: "right" }}
                 >
                   {value}
                 </span>
@@ -1808,11 +1860,13 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
             <div
               style={{
                 ...typeData,
-                fontSize: 17,
-                fontWeight: 600,
-                color: C.navyText,
-                letterSpacing: "3px",
-                wordSpacing: "8px",
+                fontFamily: C.mono,
+                fontSize: 12,
+                fontWeight: 500,
+                color: C.navyMid,
+                letterSpacing: "0.5px",
+                wordBreak: "break-all",
+                lineHeight: 1.4,
                 marginBottom: 4,
               }}
             >
