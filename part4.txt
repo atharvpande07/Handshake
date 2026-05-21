@@ -1,0 +1,1080 @@
+// ─── SCREEN: CLIENT SIGN ──────────────────────────────────────────────────────
+function ClientSign({ agreement, onAccept, t }) {
+  const [sig, setSig] = useState(null);
+  const [email, setEmail] = useState("");
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg }}>
+      <div
+        style={{
+          background: C.navy,
+          padding: "14px 20px",
+        }}
+      >
+        <span style={{ ...typeBrand, color: "#FFFFFF" }}>
+          🤝 Handshake
+        </span>
+      </div>
+
+      <div style={{ maxWidth: 420, margin: "0 auto", padding: "28px 20px 60px" }}>
+        <div style={{ ...typeHeading, marginBottom: 8 }}>
+          Sign to Accept
+        </div>
+        <p style={{ ...typeBody, marginBottom: 12 }}>
+          Draw your signature below to confirm your agreement with{" "}
+          <strong style={{ color: C.ink }}>"{agreement.projectTitle}"</strong>.
+        </p>
+
+        <div
+          style={{
+            background: C.amberLight,
+            border: `1px solid ${C.amberBorder}`,
+            borderRadius: 10,
+            padding: "10px 14px",
+            marginBottom: 24,
+            ...typeBody,
+            fontSize: 13,
+            color: C.amberDark,
+          }}
+        >
+          ⚠️ Once you sign, this deal is <strong>locked</strong> and cannot be
+          changed by either party.
+        </div>
+
+        {!sig ? (
+          <SignaturePad onSave={setSig} height={160} />
+        ) : (
+          <>
+            <div style={{ marginBottom: 20 }}>
+              <Label>Your Signature</Label>
+              <div
+                style={{
+                  border: `2px solid ${C.green}`,
+                  borderRadius: 12,
+                  padding: 10,
+                  background: C.card,
+                }}
+              >
+                <img
+                  src={sig}
+                  alt="signature"
+                  style={{ width: "100%", height: 110, objectFit: "contain" }}
+                />
+              </div>
+              <button
+                onClick={() => setSig(null)}
+                style={{ ...ghostBtn, marginTop: 10, width: "100%" }}
+              >
+                Re-draw
+              </button>
+            </div>
+            
+            <div style={{ marginBottom: 20 }}>
+              <Label>{t("Your email (optional — we'll send you a copy of the receipt)")}</Label>
+              <input
+                style={inputStyle}
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            
+            <button
+              onClick={() => onAccept(sig, email)}
+              style={{ ...confirmBtn, fontSize: 17, padding: "18px 24px" }}
+            >
+              🔒 {t("Lock Deal — I Accept →")}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: LOCKED RECEIPT ───────────────────────────────────────────────────
+function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, onPay, changeOrders = [], onSignChangeOrder, creatorEmail, clientEmail, t }) {
+  const hash = makeHash({ agreement: { ...agreement, deliverables: agreement.deliverables.filter((d) => d.trim()) }, token, ts: timestamps });
+
+  const [showEmailToast, setShowEmailToast] = useState(!!(creatorEmail || clientEmail));
+  const [isPaidAdvance, setIsPaidAdvance] = useState(false);
+  
+  const [showCoForm, setShowCoForm] = useState(false);
+  const [coDesc, setCoDesc] = useState("");
+  const [coPrice, setCoPrice] = useState("");
+  const [coSig, setCoSig] = useState(null);
+  const [coDone, setCoDone] = useState(false);
+
+  useEffect(() => {
+    if (showEmailToast) {
+      const timer = setTimeout(() => setShowEmailToast(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showEmailToast]);
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.sectionBg }}>
+      {showEmailToast && (
+        <div style={{ position: "fixed", top: 16, left: "50%", transform: "translateX(-50%)", background: C.green, color: "white", padding: "10px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600, zIndex: 100, boxShadow: C.shadowSm }}>
+          {t("Receipt sent to your email ✓")}
+        </div>
+      )}
+      <div
+        style={{
+          background: C.navy,
+          padding: "14px 20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <span style={{ ...typeBrand, color: "#FFFFFF" }}>
+          🤝 Handshake
+        </span>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: C.green,
+            padding: "5px 14px",
+            borderRadius: 20,
+          }}
+        >
+          <span style={{ color: "#FFFFFF", fontSize: 12, fontWeight: 700, fontFamily: C.sans }}>
+            🔒 DEAL LOCKED
+          </span>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 420, margin: "0 auto", padding: "20px 20px 60px" }}>
+        {/* Success banner */}
+        <div
+          style={{
+            background: C.greenLight,
+            borderRadius: 16,
+            padding: "24px 20px",
+            marginBottom: 20,
+            border: `2px solid ${C.greenBorder}`,
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: 48, marginBottom: 10 }}>🤝</div>
+          <div style={{ ...typeHeading, color: C.greenText, marginBottom: 6 }}>
+            Deal Confirmed!
+          </div>
+          <div style={{ ...typeBody, color: C.greenText }}>
+            Both parties have signed. This agreement is now locked and
+            tamper-evident.
+          </div>
+        </div>
+
+        {/* Receipt card */}
+        <div
+          style={{
+            background: C.card,
+            borderRadius: 16,
+            padding: 24,
+            marginBottom: 16,
+            boxShadow: C.shadowLg,
+            border: `1px solid ${C.border}`,
+          }}
+        >
+          {/* Title */}
+          <div
+            style={{
+              textAlign: "center",
+              paddingBottom: 20,
+              borderBottom: `1px solid ${C.divider}`,
+              marginBottom: 20,
+            }}
+          >
+            <div style={{ ...typeLabel, letterSpacing: "2.5px", marginBottom: 8 }}>
+              AGREEMENT RECEIPT
+            </div>
+            <div style={{ ...typeHeading, fontSize: 20, marginBottom: 6 }}>
+              {agreement.projectTitle}
+            </div>
+            <div style={{ ...typeData, fontSize: 15, fontWeight: 600, color: C.navyText, letterSpacing: "2px" }}>
+              {token}
+            </div>
+          </div>
+
+          {/* Fields */}
+          {[
+            { label: "Client", value: agreement.clientName },
+            {
+              label: "TOTAL AGREED",
+              value: `${agreement.currency}${Number(agreement.price).toLocaleString("en-IN")}`,
+              highlight: true,
+            },
+            agreement.deadline && {
+              label: "DELIVERY",
+              value: fmtDeadline(agreement.deadline),
+            },
+            { label: "Created", value: fmtDate(timestamps.created) },
+            { label: "Client Signed", value: fmtDate(timestamps.signed) },
+          ]
+            .filter(Boolean)
+            .map(({ label, value, highlight }) => (
+              <div
+                key={label}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 12,
+                  gap: 12,
+                }}
+              >
+                <span style={typeLabel}>{label}</span>
+                <span
+                  style={highlight ? { ...typeDataLg, color: C.green, textAlign: "right" } : { ...typeBodyStrong, textAlign: "right" }}
+                >
+                  {value}
+                </span>
+              </div>
+            ))}
+
+          {/* Deliverables */}
+          <div
+            style={{
+              borderTop: `1px solid ${C.divider}`,
+              paddingTop: 16,
+              marginBottom: 16,
+              marginTop: 4,
+            }}
+          >
+            <Label>Deliverables Agreed</Label>
+            {agreement.deliverables
+              .filter((d) => d.trim())
+              .map((d, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    marginBottom: 8,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <span style={{ color: C.green, fontWeight: 700, flexShrink: 0 }}>
+                    ✓
+                  </span>
+                  <span style={{ ...typeBody, color: C.ink }}>{d}</span>
+                </div>
+              ))}
+          </div>
+
+          {/* Signatures */}
+          <div
+            style={{
+              borderTop: `1px solid ${C.divider}`,
+              paddingTop: 16,
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 14,
+            }}
+          >
+            <div style={{ ...typeLabel, letterSpacing: "2px", gridColumn: "1 / -1" }}>SIGNATURES</div>
+            {[
+              { label: "Service Provider", sig: creatorSig, time: timestamps.created },
+              { label: "Client", sig: clientSig, time: timestamps.signed },
+            ].map(({ label, sig, time }) => (
+              <div key={label}>
+                <div style={typeLabel}>
+                  {label}
+                </div>
+                <div
+                  style={{
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 8,
+                    padding: 4,
+                    background: C.inputBg,
+                    marginTop: 6,
+                    marginBottom: 4,
+                  }}
+                >
+                  <img
+                    src={sig}
+                    alt={label}
+                    style={{ width: "100%", height: 56, objectFit: "contain" }}
+                  />
+                </div>
+                <div style={typeDataSm}>
+                  {fmtDate(time)}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Hash */}
+          <div
+            style={{
+              borderTop: `1px solid ${C.divider}`,
+              paddingTop: 14,
+              marginTop: 16,
+            }}
+          >
+            <Label>Fingerprint</Label>
+            <div
+              style={{
+                ...typeData,
+                fontSize: 17,
+                fontWeight: 600,
+                color: C.navyText,
+                letterSpacing: "3px",
+                wordSpacing: "8px",
+                marginBottom: 4,
+              }}
+            >
+              {hash}
+            </div>
+            <div style={{ ...typeBody, fontSize: 11 }}>
+              Tamper-evident hash — any modification would change this
+              fingerprint.
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Status */}
+        {agreement.advanceAmount && Number(agreement.advanceAmount) > 0 && (
+          <div style={{ background: C.card, borderRadius: 16, padding: 24, marginBottom: 16, border: `1px solid ${C.border}` }}>
+            <Label>Payment Status</Label>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, ...typeBody }}>
+              <span>Advance: <span style={typeDataMd}>{agreement.currency}{Number(agreement.advanceAmount).toLocaleString("en-IN")}</span></span>
+              <span style={{ fontWeight: 600, color: isPaidAdvance ? C.green : C.navyMid }}>{isPaidAdvance ? "Paid ✓" : "Pending"}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16, ...typeBody }}>
+              <span>Final: <span style={typeDataMd}>{agreement.currency}{(Number(agreement.price) - Number(agreement.advanceAmount)).toLocaleString("en-IN")}</span></span>
+              <span style={{ fontWeight: 600, color: C.muted }}>Pending</span>
+            </div>
+            {!isPaidAdvance && (
+              <button onClick={() => setIsPaidAdvance(true)} style={{ ...outlineBtn, padding: "8px 12px", fontSize: 13, width: "100%" }}>
+                Mark advance as paid
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Change Orders List */}
+        {changeOrders.length > 0 && (
+          <div style={{ background: C.card, borderRadius: 16, padding: 24, marginBottom: 16, border: `1px solid ${C.border}` }}>
+            <div style={{ ...typeHeading, marginBottom: 16 }}>Addendums</div>
+            {changeOrders.map((co, idx) => (
+              <div key={idx} style={{ marginBottom: idx < changeOrders.length - 1 ? 24 : 0, paddingBottom: idx < changeOrders.length - 1 ? 24 : 0, borderBottom: idx < changeOrders.length - 1 ? `1px solid ${C.divider}` : "none" }}>
+                <div style={{ ...typeBodyStrong, fontSize: 15, marginBottom: 8 }}>{co.description}</div>
+                {co.extraPrice && <div style={{ ...typeDataMd, color: C.green, marginBottom: 12 }}>+ {agreement.currency}{Number(co.extraPrice).toLocaleString("en-IN")}</div>}
+                <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <Label>Provider</Label>
+                    <img src={co.creatorSig} alt="Creator sig" style={{ height: 40, width: "100%", objectFit: "contain", border: `1px solid ${C.border}`, borderRadius: 8, padding: 4 }} />
+                    <div style={{ ...typeDataSm, marginTop: 4 }}>{fmtDate(co.createdAt)}</div>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Label>Client</Label>
+                    {co.clientSig ? (
+                      <>
+                        <img src={co.clientSig} alt="Client sig" style={{ height: 40, width: "100%", objectFit: "contain", border: `1px solid ${C.border}`, borderRadius: 8, padding: 4 }} />
+                        <div style={{ ...typeDataSm, marginTop: 4 }}>{fmtDate(co.signedAt)}</div>
+                      </>
+                    ) : (
+                      <div style={{ height: 40, border: `1px dashed ${C.border}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", ...typeBody, fontSize: 12 }}>Pending</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {/* Add Change Order */}
+        {!showCoForm && !coDone ? (
+          <button onClick={() => setShowCoForm(true)} style={{ ...outlineBtn, width: "100%", marginBottom: 16 }}>
+            {t("Add Change Order")}
+          </button>
+        ) : showCoForm ? (
+          <div style={{ background: C.card, borderRadius: 16, padding: 20, marginBottom: 16, border: `1px solid ${C.border}` }}>
+            <div style={{ ...typeHeadingSm, marginBottom: 16 }}>New Change Order</div>
+            <div style={{ marginBottom: 12 }}>
+              <Label>What's changing?</Label>
+              <textarea style={{ ...inputStyle, minHeight: 60 }} value={coDesc} onChange={e => setCoDesc(e.target.value)} placeholder="e.g. Added 2 extra pages" />
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <Label>Additional price (optional)</Label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <div style={{ ...inputStyle, width: 70, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", background: C.sectionBg }}>{agreement.currency}</div>
+                <input style={{ ...inputStyle, ...typeDataMd }} type="number" value={coPrice} onChange={e => setCoPrice(e.target.value)} placeholder="0" />
+              </div>
+            </div>
+            
+            <div style={{ background: C.amberLight, padding: 10, borderRadius: 8, ...typeBody, fontSize: 12, color: C.amberDark, marginBottom: 16 }}>Both parties must re-sign this change order</div>
+            
+            {!coSig ? (
+              <SignaturePad onSave={setCoSig} height={120} />
+            ) : (
+              <>
+                <Label>Your Signature</Label>
+                <img src={coSig} alt="co sig" style={{ height: 80, width: "100%", objectFit: "contain", border: `1px solid ${C.border}`, borderRadius: 8, marginBottom: 12 }} />
+                <button onClick={() => setCoSig(null)} style={{ ...ghostBtn, width: "100%", marginBottom: 12 }}>Re-draw</button>
+                <button 
+                  onClick={() => {
+                    onSignChangeOrder(coSig, coDesc, coPrice);
+                    setShowCoForm(false);
+                    setCoDone(true);
+                  }} 
+                  style={{ ...outlineBtn, width: "100%" }}
+                  disabled={!coDesc.trim()}
+                >
+                  Send for client re-sign →
+                </button>
+              </>
+            )}
+          </div>
+        ) : null}
+
+        {coDone && (
+          <div style={{ background: C.card, borderRadius: 16, padding: 20, marginBottom: 16, border: `1px solid ${C.border}` }}>
+            <div style={{ ...typeBodyStrong, color: C.green, marginBottom: 8 }}>✅ Change Order Created</div>
+            <div style={{ ...typeBody, fontSize: 13, marginBottom: 12 }}>Share this link with {agreement.clientName} to get their signature:</div>
+            <button onClick={() => {
+              const msg = `Hi ${agreement.clientName}, I've added a change order to our agreement. Please review and sign: https://handshake.app/deal/${token}`;
+              window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+            }} style={{ ...primaryBtn, background: C.whatsapp, width: "100%", boxShadow: "none" }}>
+              💬 WhatsApp Client
+            </button>
+          </div>
+        )}
+
+        {/* PDF CTA */}
+        {!isPaid ? (
+          <div
+            style={{
+              background: C.navy,
+              borderRadius: 16,
+              padding: 24,
+              marginBottom: 16,
+            }}
+          >
+            <div
+              style={{
+                ...typeHeading,
+                color: "#FFFFFF",
+                marginBottom: 8,
+              }}
+            >
+              📄 Download Official PDF
+            </div>
+            <div
+              style={{
+                ...typeBody,
+                color: "rgba(255,255,255,0.7)",
+                marginBottom: 18,
+              }}
+            >
+              Clean, professional PDF receipt — perfect for your records or
+              sharing with clients. No watermark, full branding.
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 18,
+              }}
+            >
+              <div>
+                <span
+                  style={{ ...typeDataLg, color: "#FFFFFF" }}
+                >
+                  ₹49
+                </span>
+                <span
+                  style={{
+                    color: "rgba(255,255,255,0.5)",
+                    fontSize: 13,
+                    marginLeft: 8,
+                    fontFamily: C.sans,
+                  }}
+                >
+                  one-time · no subscription
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={onPay}
+              style={{
+                ...primaryBtn,
+                flex: "none",
+                width: "100%",
+              }}
+            >
+              Get PDF →
+            </button>
+          </div>
+        ) : (
+          <div
+            style={{
+              background: C.greenLight,
+              borderRadius: 16,
+              padding: 20,
+              border: `2px solid ${C.greenBorder}`,
+              marginBottom: 16,
+            }}
+          >
+            <div
+              style={{ ...typeBodyStrong, color: C.greenText, marginBottom: 8 }}
+            >
+              ✅ PDF Downloaded Successfully!
+            </div>
+            <div style={{ ...typeBody, fontSize: 13, color: C.greenText }}>
+              Your branded PDF agreement receipt has been saved. Share it or
+              keep it for your records.
+            </div>
+          </div>
+        )}
+
+        <p
+          style={{
+            ...typeBody,
+            textAlign: "center",
+            fontSize: 11,
+            marginTop: 8,
+          }}
+        >
+          This is a deal confirmation receipt, not a legally binding contract.
+          <br />
+          For formal contracts, consult a legal professional.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: PAYMENT ──────────────────────────────────────────────────────────
+function Payment({ agreement, token, onSuccess, onBack }) {
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [cardNum, setCardNum] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [name, setName] = useState("");
+  const [upiId, setUpiId] = useState("");
+  const [method, setMethod] = useState("card");
+
+  const canPayCard = name && cardNum.length === 19 && expiry.length === 5 && cvv.length === 3;
+  const canPayUpi = upiId.includes("@");
+  const canPay = method === "card" ? canPayCard : canPayUpi;
+
+  const pay = () => {
+    if (!canPay) return;
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setDone(true);
+      setTimeout(onSuccess, 1200);
+    }, 2000);
+  };
+
+  const fmtCard = (v) =>
+    v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
+  const fmtExp = (v) => {
+    const d = v.replace(/\D/g, "").slice(0, 4);
+    return d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
+  };
+
+  const methodBtn = (id, label) => (
+    <button
+      onClick={() => setMethod(id)}
+      style={{
+        flex: 1,
+        padding: "12px 8px",
+        borderRadius: 10,
+        border: `2px solid ${method === id ? C.borderStrong : C.border}`,
+        background: method === id ? C.inputBg : C.card,
+        color: method === id ? C.ink : C.muted,
+        fontSize: 13,
+        fontWeight: 600,
+        cursor: "pointer",
+        fontFamily: C.sans,
+        transition: "all 0.15s",
+      }}
+    >
+      {label}
+    </button>
+  );
+
+  if (done) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: C.bg,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ textAlign: "center", padding: 40 }}>
+          <div style={{ fontSize: 64, marginBottom: 16 }}>✅</div>
+          <div style={{ ...typeHeading, marginBottom: 8 }}>
+            Payment Successful!
+          </div>
+          <div style={typeBody}>
+            Preparing your PDF...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg }}>
+      <div style={{ maxWidth: 420, margin: "0 auto", padding: "20px 20px 60px" }}>
+        <button
+          onClick={onBack}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: 22,
+            marginBottom: 16,
+            padding: 0,
+            lineHeight: 1,
+            color: C.ink,
+          }}
+        >
+          ←
+        </button>
+        <div style={{ ...typeHeading, marginBottom: 4 }}>
+          Get PDF Receipt
+        </div>
+        <p style={{ ...typeBody, marginBottom: 24 }}>
+          Secure payment via Razorpay
+        </p>
+
+        {/* Order summary */}
+        <div
+          style={{
+            background: C.card,
+            borderRadius: 16,
+            padding: "16px 20px",
+            marginBottom: 24,
+            border: `1px solid ${C.border}`,
+            boxShadow: C.shadowSm,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <div style={typeBodyStrong}>
+                PDF Agreement Receipt
+              </div>
+              <div style={{ ...typeDataSm, marginTop: 4 }}>
+                {token}
+              </div>
+            </div>
+            <div style={typeDataLg}>
+              ₹49
+            </div>
+          </div>
+          <div style={{ ...typeBody, fontSize: 12, marginTop: 12 }}>
+            one-time · no subscription
+          </div>
+        </div>
+
+        {/* Payment method */}
+        <div style={{ marginBottom: 16 }}>
+          <Label>Payment Method</Label>
+          <div style={{ display: "flex", gap: 8 }}>
+            {methodBtn("card", "💳 Card")}
+            {methodBtn("upi", "📱 UPI")}
+            {methodBtn("netbanking", "🏦 Net Banking")}
+          </div>
+        </div>
+
+        {/* Card form */}
+        {method === "card" && (
+          <div
+            style={{
+              background: C.card,
+              borderRadius: 16,
+              padding: 20,
+              marginBottom: 20,
+              border: `1px solid ${C.border}`,
+            }}
+          >
+            <div style={{ marginBottom: 12 }}>
+              <input
+                style={inputStyle}
+                placeholder="Cardholder name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <input
+                style={{ ...inputStyle, ...typeDataMd }}
+                placeholder="Card number"
+                value={cardNum}
+                onChange={(e) => setCardNum(fmtCard(e.target.value))}
+                maxLength={19}
+                inputMode="numeric"
+              />
+            </div>
+            <div
+              style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}
+            >
+              <input
+                style={{ ...inputStyle, ...typeDataMd }}
+                placeholder="MM/YY"
+                value={expiry}
+                onChange={(e) => setExpiry(fmtExp(e.target.value))}
+                maxLength={5}
+                inputMode="numeric"
+              />
+              <input
+                style={{ ...inputStyle, ...typeDataMd }}
+                placeholder="CVV"
+                value={cvv}
+                onChange={(e) =>
+                  setCvv(e.target.value.replace(/\D/g, "").slice(0, 3))
+                }
+                maxLength={3}
+                inputMode="numeric"
+                type="password"
+              />
+            </div>
+          </div>
+        )}
+
+        {method === "upi" && (
+          <div
+            style={{
+              background: C.card,
+              borderRadius: 16,
+              padding: 20,
+              marginBottom: 20,
+              border: `1px solid ${C.border}`,
+            }}
+          >
+            <input
+              style={inputStyle}
+              placeholder="your@upi"
+              value={upiId}
+              onChange={(e) => setUpiId(e.target.value)}
+              inputMode="email"
+            />
+            <div style={{ ...typeBody, fontSize: 12, marginTop: 8 }}>
+              e.g. name@okaxis, name@paytm, 9876543210@upi
+            </div>
+          </div>
+        )}
+
+        {method === "netbanking" && (
+          <div
+            style={{
+              background: C.card,
+              borderRadius: 16,
+              padding: 20,
+              marginBottom: 20,
+              border: `1px solid ${C.border}`,
+            }}
+          >
+            <select style={inputStyle}>
+              <option>Select your bank</option>
+              <option>State Bank of India</option>
+              <option>HDFC Bank</option>
+              <option>ICICI Bank</option>
+              <option>Axis Bank</option>
+              <option>Kotak Mahindra Bank</option>
+            </select>
+          </div>
+        )}
+
+        <button
+          onClick={pay}
+          disabled={!canPay || loading}
+          style={{
+            ...primaryBtn,
+            flex: "none",
+            width: "100%",
+            opacity: canPay ? 1 : 0.45,
+          }}
+        >
+          {loading ? "⏳ Processing..." : "🔒 Pay ₹49 →"}
+        </button>
+
+        <div
+          style={{
+            ...typeDataSm,
+            textAlign: "center",
+            marginTop: 14,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+          }}
+        >
+          🔒 Secured by Razorpay · PCI DSS compliant · 256-bit SSL
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: DASHBOARD ────────────────────────────────────────────────────────
+function Dashboard({ onBack, onOpenDeal }) {
+  const [deals, setDeals] = useState([]);
+  
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("handshake_agreements");
+      if (stored) setDeals(JSON.parse(stored));
+    } catch(e) {}
+  }, []);
+
+  const sendBackup = () => {
+    const tokens = deals.map(d => `handshake.app/deal/${d.token}`).join("\n");
+    navigator.clipboard.writeText(tokens).catch(() => {});
+    alert("Copied all deal links to clipboard! (Simulated email backup)");
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg }}>
+      <div style={{ maxWidth: 420, margin: "0 auto", padding: "20px 20px 60px" }}>
+        <button
+          onClick={onBack}
+          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 22, marginBottom: 16, padding: 0, lineHeight: 1, color: C.ink }}
+        >
+          ←
+        </button>
+        <div style={{ ...typeHeading, marginBottom: 24, display: "flex", alignItems: "center", gap: 8 }}>
+          <span>🤝</span> My Deals
+        </div>
+
+        {deals.length === 0 ? (
+          <div style={{ ...typeBody, textAlign: "center", padding: "40px 20px" }}>
+            No deals yet. Create your first agreement.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 24 }}>
+            {deals.map(deal => (
+              <div key={deal.token} style={{ background: C.card, borderRadius: 16, padding: 16, border: `1px solid ${C.border}`, boxShadow: C.shadowSm }}>
+                <div style={{ ...typeBodyStrong, marginBottom: 4 }}>{deal.projectTitle}</div>
+                <div style={{ ...typeBody, fontSize: 13, marginBottom: 8 }}>{deal.clientName}</div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <div style={{ ...typeDataMd, color: C.green }}>{deal.currency}{Number(deal.price).toLocaleString("en-IN")}</div>
+                  <div style={{ ...typeLabel, padding: "4px 8px", borderRadius: 12, ...({
+                    pending: { background: C.amberLight, color: C.amberDark },
+                    signed: { background: C.greenLight, color: C.greenText },
+                    locked: { background: C.sectionBg, color: C.ink }
+                  }[deal.status] || { background: C.amberLight, color: C.amberDark })}}>
+                    {deal.status === "pending" ? "⏳ Pending" : deal.status === "signed" ? "✅ Signed" : "🔒 Locked"}
+                  </div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ ...typeDataSm, color: C.muted }}>{new Date(deal.createdAt).toLocaleDateString("en-IN")}</div>
+                  <div style={typeDataSm}>{deal.token}</div>
+                  <button onClick={() => onOpenDeal(deal.token)} style={{ ...ghostBtn, padding: "6px 12px" }}>Open →</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div style={{ background: C.card, padding: 16, borderRadius: 12, border: `1px solid ${C.border}` }}>
+          <div style={{ ...typeBody, fontSize: 13, marginBottom: 10 }}>
+            💡 These are saved in this browser only. Email yourself a backup:
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input style={{ ...inputStyle, padding: "10px 14px" }} type="email" placeholder="Email address" />
+            <button onClick={sendBackup} style={outlineBtn}>Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+export default function App() {
+  const [screen, setScreen] = useState("landing");
+  const [agreement, setAgreement] = useState(null);
+  const [creatorSig, setCreatorSig] = useState(null);
+  const [clientSig, setClientSig] = useState(null);
+  const [token, setToken] = useState(null);
+  const [timestamps, setTimestamps] = useState({});
+  const [isPaid, setIsPaid] = useState(false);
+  const [changeOrders, setChangeOrders] = useState([]);
+  const [creatorEmail, setCreatorEmail] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  
+  const [language, setLanguage] = useState(() => {
+    try { return localStorage.getItem("handshake_lang") || "en"; } catch(e) { return "en"; }
+  });
+
+  const toggleLanguage = () => {
+    setLanguage(prev => {
+      const next = prev === "en" ? "hi" : "en";
+      try { localStorage.setItem("handshake_lang", next); } catch(e) {}
+      return next;
+    });
+  };
+
+  const t = (key) => TRANSLATIONS[language][key] || key;
+
+  // Load fonts and inject focus styles
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,600&display=swap";
+    document.head.appendChild(link);
+    
+    const style = document.createElement("style");
+    style.innerHTML = `
+      input:focus, textarea:focus, select:focus {
+        border-color: ${C.amber} !important;
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12) !important;
+        outline: none !important;
+        background: #FFFFFF !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(link);
+      document.head.removeChild(style);
+    };
+  }, []);
+
+  const go = (s) => setScreen(s);
+
+  const handleCreateDone = (form) => {
+    setAgreement(form);
+    go("creatorSign");
+  };
+
+  const handleCreatorSigned = (sig, email) => {
+    setCreatorSig(sig);
+    if (email) setCreatorEmail(email);
+    const t = genToken();
+    setToken(t);
+    setTimestamps((ts) => ({ ...ts, created: Date.now() }));
+    go("share");
+  };
+
+  const handleClientAccepted = (sig, email) => {
+    setClientSig(sig);
+    if (email) setClientEmail(email);
+    setTimestamps((ts) => ({ ...ts, signed: Date.now() }));
+    
+    // Update dashboard record to locked
+    try {
+      const stored = localStorage.getItem("handshake_agreements");
+      if (stored) {
+        const deals = JSON.parse(stored);
+        const match = deals.find(d => d.token === token);
+        if (match) {
+          match.status = "locked";
+          localStorage.setItem("handshake_agreements", JSON.stringify(deals));
+        }
+      }
+    } catch(e) {}
+    
+    go("receipt");
+  };
+
+  const handlePaySuccess = () => {
+    setIsPaid(true);
+    go("receipt");
+  };
+  
+  const handleSignChangeOrder = (creatorSig, description, extraPrice) => {
+    const newCo = { description, extraPrice, creatorSig, clientSig: null, createdAt: Date.now(), signedAt: null };
+    setChangeOrders(prev => [...prev, newCo]);
+  };
+  
+  const handleClientSignChangeOrder = (clientSig, index) => {
+    setChangeOrders(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], clientSig, signedAt: Date.now() };
+      return updated;
+    });
+  };
+
+  const screens = {
+    landing: <Landing onStart={() => go("create")} t={t} language={language} toggleLanguage={toggleLanguage} onDashboard={() => go("dashboard")} />,
+    dashboard: <Dashboard onBack={() => go("landing")} onOpenDeal={(t) => { alert("Opening deal " + t + " simulation"); }} />,
+    create: <CreateAgreement onNext={handleCreateDone} t={t} />,
+    creatorSign: agreement && (
+      <CreatorSign agreement={agreement} onNext={handleCreatorSigned} t={t} />
+    ),
+    share: token && agreement && (
+      <ShareScreen
+        token={token}
+        agreement={agreement}
+        onSimulateClient={() => go("clientView")}
+        t={t}
+      />
+    ),
+    clientView: agreement && creatorSig && (
+      <ClientView
+        agreement={agreement}
+        creatorSig={creatorSig}
+        token={token}
+        changeOrders={changeOrders}
+        onSign={() => go("clientSign")}
+        onSignChangeOrder={handleClientSignChangeOrder}
+        t={t}
+      />
+    ),
+    clientSign: agreement && (
+      <ClientSign agreement={agreement} onAccept={handleClientAccepted} t={t} />
+    ),
+    receipt: agreement && creatorSig && clientSig && (
+      <Receipt
+        agreement={agreement}
+        creatorSig={creatorSig}
+        clientSig={clientSig}
+        token={token}
+        timestamps={timestamps}
+        isPaid={isPaid}
+        onPay={() => go("payment")}
+        changeOrders={changeOrders}
+        onSignChangeOrder={handleSignChangeOrder}
+        creatorEmail={creatorEmail}
+        clientEmail={clientEmail}
+        t={t}
+      />
+    ),
+    payment: agreement && (
+      <Payment
+        agreement={agreement}
+        token={token}
+        onSuccess={handlePaySuccess}
+        onBack={() => go("receipt")}
+        t={t}
+      />
+    ),
+  };
+
+  return (
+    <div
+      style={{
+        fontFamily: C.sans,
+        background: C.bg,
+        minHeight: "100vh",
+      }}
+    >
+      {screens[screen] || screens.landing}
+    </div>
+  );
+}

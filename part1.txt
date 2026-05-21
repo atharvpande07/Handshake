@@ -1,0 +1,660 @@
+import { useState, useRef, useEffect, useCallback } from "react";
+
+// ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
+const C = {
+  sans:    "'Inter', 'DM Sans', sans-serif",
+  serif:   "'Playfair Display', Georgia, serif",
+  mono:    "'JetBrains Mono', 'Courier New', monospace",
+  display: "'Playfair Display', Georgia, serif",
+
+  bg:         "#F7F7F5",
+  card:       "#FFFFFF",
+  inputBg:    "#FAFAF8",
+  sectionBg:  "#F0EFE9",
+
+  ink:        "#0A0A0A",
+  muted:      "#6B6B6B",
+  faint:      "#A3A3A3",
+
+  amber:      "#D97706",
+  amberHover: "#B45309",
+  amberLight: "#FFFBEB",
+  amberBorder:"#FDE68A",
+  amberDark:  "#92400E",
+
+  navy:       "#0F172A",
+  navyMid:    "#1E293B",
+  navyLight:  "#334155",
+  navyText:   "#1E3A5F",
+
+  green:        "#059669",
+  greenHover:   "#047857",
+  greenLight:   "#ECFDF5",
+  greenBorder:  "#6EE7B7",
+  greenText:    "#065F46",
+
+  border:     "#E4E4E0",
+  borderStrong: "#C9C9C4",
+  divider:    "#F0EFEB",
+  slate:      "#64748B",
+
+  red:        "#DC2626",
+  redLight:   "#FEF2F2",
+  purple:     "#7C3AED",
+  purpleLight:"#F5F3FF",
+  whatsapp:   "#25D366",
+
+  shadowSm:   "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+  shadowMd:   "0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04)",
+  shadowLg:   "0 8px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06)",
+  shadowAmber:"0 4px 20px rgba(217,119,6,0.20)",
+  shadowGreen:"0 4px 20px rgba(5,150,105,0.18)",
+};
+
+const typeBrand = {
+  fontFamily: C.serif,
+  fontSize: 20,
+  fontWeight: 700,
+  letterSpacing: "-0.3px",
+  lineHeight: 1,
+};
+
+const typeHeading = {
+  fontFamily: C.sans,
+  fontSize: 22,
+  fontWeight: 700,
+  letterSpacing: "-0.4px",
+  lineHeight: 1.25,
+  color: C.ink,
+};
+const typeHeadingLg = { ...typeHeading, fontSize: 28, letterSpacing: "-0.6px" };
+const typeHeadingSm = { ...typeHeading, fontSize: 17, letterSpacing: "-0.2px" };
+
+const typeBody = {
+  fontFamily: C.sans,
+  fontSize: 14,
+  fontWeight: 400,
+  lineHeight: 1.65,
+  color: C.muted,
+  letterSpacing: "0px",
+};
+const typeBodyStrong = { ...typeBody, fontWeight: 600, color: C.ink };
+const typeBodyLg = { ...typeBody, fontSize: 15, lineHeight: 1.7 };
+
+const typeLabel = {
+  fontFamily: C.sans,
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "1px",
+  textTransform: "uppercase",
+  color: C.slate,
+  lineHeight: 1,
+};
+
+const typeData = {
+  fontFamily: C.mono,
+  fontSize: 14,
+  fontWeight: 400,
+  letterSpacing: "0.3px",
+  lineHeight: 1.4,
+  color: C.ink,
+};
+const typeDataLg = { ...typeData, fontSize: 24, fontWeight: 600, letterSpacing: "-0.3px" };
+const typeDataMd = { ...typeData, fontSize: 16, fontWeight: 600 };
+const typeDataSm = { ...typeData, fontSize: 11, color: C.slate };
+const typeDataAmber = { ...typeData, fontSize: 20, fontWeight: 600, color: C.amber };
+
+const primaryBtn = {
+  flex: 1,
+  padding: "16px 24px",
+  background: C.amber,
+  color: "#FFFFFF",
+  border: "none",
+  borderRadius: 14,
+  fontSize: 15,
+  fontWeight: 600,
+  cursor: "pointer",
+  fontFamily: C.sans,
+  letterSpacing: "0.1px",
+  boxShadow: C.shadowAmber,
+  transition: "background 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease",
+  WebkitTapHighlightColor: "transparent",
+};
+
+const confirmBtn = {
+  ...primaryBtn,
+  flex: "none",
+  width: "100%",
+  background: C.green,
+  boxShadow: C.shadowGreen,
+};
+
+const outlineBtn = {
+  padding: "13px 20px",
+  background: C.card,
+  color: C.ink,
+  border: `1.5px solid ${C.border}`,
+  borderRadius: 12,
+  fontSize: 14,
+  fontWeight: 500,
+  cursor: "pointer",
+  fontFamily: C.sans,
+  transition: "border-color 0.15s ease, background 0.15s ease",
+  WebkitTapHighlightColor: "transparent",
+};
+
+const ghostBtn = {
+  padding: "10px 16px",
+  background: "transparent",
+  color: C.muted,
+  border: "none",
+  borderRadius: 10,
+  fontSize: 13,
+  fontWeight: 500,
+  cursor: "pointer",
+  fontFamily: C.sans,
+  WebkitTapHighlightColor: "transparent",
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "14px 16px",
+  borderRadius: 12,
+  fontSize: 15,
+  border: `1.5px solid ${C.border}`,
+  background: C.inputBg,
+  color: C.ink,
+  fontFamily: C.sans,
+  outline: "none",
+  boxSizing: "border-box",
+  transition: "border-color 0.15s ease, box-shadow 0.15s ease",
+  WebkitAppearance: "none",
+};
+
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+function makeHash(obj) {
+  const str = JSON.stringify(obj);
+  let h = 0x811c9dc5 >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).toUpperCase().padStart(8, "0");
+}
+
+function genToken() {
+  const seg = () => Math.random().toString(36).substr(2, 3).toUpperCase();
+  return `HSK-${seg()}-${seg()}-${seg()}`;
+}
+
+function fmtDate(ts) {
+  if (!ts) return "—";
+  return new Date(ts).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function fmtDeadline(dateStr) {
+  if (!dateStr) return null;
+  return new Date(dateStr).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+// ─── TRANSLATIONS ─────────────────────────────────────────────────────────────
+const TRANSLATIONS = {
+  en: {},
+  hi: {
+    "Create Agreement — Free →": "मुफ्त में डील बनाएं →",
+    "Continue →": "आगे बढ़ें →",
+    "Use Signature →": "हस्ताक्षर लगाएं →",
+    "Create & Share Agreement →": "डील बनाएं और शेयर करें →",
+    "Lock Deal — I Accept →": "डील लॉक करें — मैं सहमत हूं →",
+    "Get PDF — ₹49 →": "PDF डाउनलोड करें — ₹49 →",
+    "Add Change Order": "बदलाव जोड़ें",
+    "Client's full name *": "क्लाइंट का नाम *",
+    "Project / service title *": "प्रोजेक्ट / सेवा का नाम *",
+    "Total price *": "कुल कीमत *",
+    "Delivery deadline": "डिलीवरी की तारीख",
+    "Notes / payment terms (optional)": "नोट्स / पेमेंट की शर्तें (optional)",
+    "Your email (optional — we'll send you a copy of the receipt)": "आपका ईमेल (optional — we'll send you a copy of the receipt)",
+    "What's Included": "क्या शामिल है",
+    "Deal Details": "डील की जानकारी",
+    "Scope & Deliverables": "काम का दायरा",
+    "Price & Timeline": "कीमत और समयसीमा",
+    "Add Your Signature": "अपने हस्ताक्षर करें",
+    "Agreement Created!": "डील बन गई!",
+    "Deal Confirmed!": "डील पक्की हो गई!",
+    "Waiting for client signature": "क्लाइंट के हस्ताक्षर का इंतज़ार",
+    "Draw your signature here": "यहाँ हस्ताक्षर करें",
+  }
+};
+
+// ─── TEMPLATES ────────────────────────────────────────────────────────────────
+const TEMPLATES = {
+  "General": ["", "", ""],
+  "📸 Photographer": [
+    "Photoshoot session (location and duration as agreed)",
+    "Up to [X] edited high-resolution images delivered via Google Drive",
+    "Basic color correction and retouching included",
+    "RAW files not included unless separately agreed",
+    "Delivery within 7 working days of shoot date"
+  ],
+  "⚡ Electrician": [
+    "Electrical work as described in project title",
+    "All labour included in quoted price",
+    "Materials [included / to be billed separately — confirm before work starts]",
+    "Work area to be left clean after completion",
+    "1-month warranty on workmanship (not on client-supplied materials)"
+  ],
+  "🎨 Designer": [
+    "Design deliverables as described in project title",
+    "Up to [X] rounds of revisions included",
+    "Final files delivered in agreed formats (PDF, PNG, AI, Figma link)",
+    "Source files shared after full payment",
+    "Client to provide all required content, text, and brand assets before work starts"
+  ],
+  "💻 Developer": [
+    "Development work as described in project title",
+    "Up to [X] rounds of feedback/revisions included",
+    "Code delivered via GitHub repo or ZIP on completion",
+    "Hosting, domain, and third-party service costs not included unless stated",
+    "1 week of post-delivery bug fixes included at no extra charge"
+  ],
+  "☀️ Solar": [
+    "Supply and installation of solar system as described",
+    "All panels, inverter, wiring, and mounting hardware included in quoted price",
+    "Installation at agreed site location only",
+    "Post-installation testing and handover included",
+    "Warranty as per manufacturer terms — documentation provided on completion"
+  ],
+  "✍️ Writer": [
+    "Written content as described in project title",
+    "Up to [X] rounds of revisions included",
+    "Word count: [X] words (approximate)",
+    "SEO optimization [included / not included]",
+    "Content delivered as Google Doc or Word file"
+  ],
+  "🏗️ Contractor": [
+    "Construction/renovation work as described in project title",
+    "All labour included in quoted price",
+    "Materials [included / to be billed separately]",
+    "Work timeline: [X] working days from start date",
+    "Site to be cleaned and debris removed on completion"
+  ]
+};
+
+// ─── LABEL ────────────────────────────────────────────────────────────────────
+function Label({ children }) {
+  return (
+    <div style={typeLabel}>
+      {children}
+    </div>
+  );
+}
+
+// ─── SIGNATURE PAD ────────────────────────────────────────────────────────────
+function SignaturePad({ onSave, height = 150 }) {
+  const canvasRef = useRef(null);
+  const ctxRef = useRef(null);
+  const drawing = useRef(false);
+  const [hasMark, setHasMark] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const init = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width) return;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const c = canvas.getContext("2d");
+      c.scale(dpr, dpr);
+      c.strokeStyle = C.ink;
+      c.lineWidth = 2.5;
+      c.lineCap = "round";
+      c.lineJoin = "round";
+      ctxRef.current = c;
+    };
+    requestAnimationFrame(init);
+
+    const stopProp = (e) => e.preventDefault();
+    canvas.addEventListener("touchstart", stopProp, { passive: false });
+    canvas.addEventListener("touchmove", stopProp, { passive: false });
+    return () => {
+      canvas.removeEventListener("touchstart", stopProp);
+      canvas.removeEventListener("touchmove", stopProp);
+    };
+  }, []);
+
+  const getXY = useCallback((e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+  }, []);
+
+  const onDown = useCallback(
+    (e) => {
+      drawing.current = true;
+      const c = ctxRef.current;
+      if (!c) return;
+      const { x, y } = getXY(e);
+      c.beginPath();
+      c.moveTo(x, y);
+    },
+    [getXY]
+  );
+
+  const onMove = useCallback(
+    (e) => {
+      if (!drawing.current || !ctxRef.current) return;
+      const { x, y } = getXY(e);
+      ctxRef.current.lineTo(x, y);
+      ctxRef.current.stroke();
+      setHasMark(true);
+    },
+    [getXY]
+  );
+
+  const onUp = useCallback(() => {
+    drawing.current = false;
+  }, []);
+
+  const clear = () => {
+    const canvas = canvasRef.current;
+    const c = ctxRef.current;
+    if (!c) return;
+    c.clearRect(0, 0, canvas.width, canvas.height);
+    setHasMark(false);
+  };
+
+  const save = () => {
+    if (hasMark) onSave(canvasRef.current.toDataURL("image/png"));
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          border: `2px dashed ${hasMark ? C.amber : C.border}`,
+          borderRadius: 14,
+          overflow: "hidden",
+          background: C.inputBg,
+          position: "relative",
+          touchAction: "none",
+          transition: "border-color 0.2s",
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          style={{ width: "100%", height, display: "block", touchAction: "none", cursor: "crosshair" }}
+          onMouseDown={onDown}
+          onMouseMove={onMove}
+          onMouseUp={onUp}
+          onMouseLeave={onUp}
+          onTouchStart={onDown}
+          onTouchMove={onMove}
+          onTouchEnd={onUp}
+        />
+        {!hasMark && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              color: C.muted,
+              pointerEvents: "none",
+              gap: 8,
+            }}
+          >
+            <span style={{ fontSize: 32 }}>✍️</span>
+            <span style={typeBody}>Draw your signature here</span>
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+        <button onClick={clear} style={ghostBtn}>
+          Clear
+        </button>
+        <button
+          onClick={save}
+          disabled={!hasMark}
+          style={{ ...primaryBtn, flex: "none", width: "100%", opacity: hasMark ? 1 : 0.45 }}
+        >
+          Use Signature →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: LANDING ──────────────────────────────────────────────────────────
+function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
+      <nav
+        style={{
+          padding: "16px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: `1px solid ${C.border}`,
+          background: C.navy,
+        }}
+      >
+        <div style={{ ...typeBrand, color: "#FFFFFF", display: "flex", alignItems: "center", gap: 8 }}>
+          <span>🤝</span> Handshake
+        </div>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <button onClick={toggleLanguage} style={{ ...outlineBtn, fontSize: 12, padding: "6px 14px", color: "#FFFFFF", borderColor: C.navyLight, background: "transparent" }}>
+            {language === "hi" ? "EN | हिंदी" : "हिंदी | EN"}
+          </button>
+          <button onClick={onDashboard} style={{ ...ghostBtn, color: "rgba(255,255,255,0.75)", fontSize: 12 }}>
+            My Deals →
+          </button>
+          <span
+            style={{
+              ...typeLabel,
+              color: C.navyText,
+              background: C.amberLight,
+              padding: "5px 12px",
+              borderRadius: 20,
+              border: `1px solid ${C.amberBorder}`,
+            }}
+          >
+            {t("Free · No account")}
+          </span>
+        </div>
+      </nav>
+
+      <div style={{ flex: 1, maxWidth: 420, margin: "0 auto", padding: "40px 24px 60px", width: "100%" }}>
+        {/* Hero */}
+        <div style={{ marginBottom: 10 }}>
+          <span style={{ ...typeLabel, color: C.amber }}>
+            For freelancers & small businesses
+          </span>
+        </div>
+        <h1
+          style={{
+            ...typeHeadingLg,
+            fontSize: 38,
+            letterSpacing: "-0.8px",
+            lineHeight: 1.15,
+            marginBottom: 20,
+          }}
+        >
+          Close deals.
+          <br />
+          No more scope
+          <br />
+          <em style={{ color: C.amber, fontStyle: "normal" }}>disputes.</em>
+        </h1>
+        <p style={{ ...typeBodyLg, marginBottom: 36, maxWidth: 340 }}>
+          Create a simple agreement in 60 seconds. Share on WhatsApp. Get it
+          signed. Keep a clean, tamper-evident record.
+        </p>
+
+        <button
+          onClick={onStart}
+          style={{ ...primaryBtn, flex: "none", width: "100%", fontSize: 17, padding: "18px 24px" }}
+        >
+          {t("Get Started →")}
+        </button>
+        <div
+          style={{
+            marginTop: 14,
+            display: "flex",
+            gap: 16,
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {["⚡ Under 60 seconds", "📱 WhatsApp-ready", "🔒 Tamper-evident"].map((text) => (
+            <span key={text} style={{ ...typeBody, fontSize: 12, fontWeight: 500 }}>
+              {text}
+            </span>
+          ))}
+        </div>
+
+        {/* Stats */}
+        <div style={{ display: "flex", gap: 16, marginTop: 36, marginBottom: 16 }}>
+          <div style={{ flex: 1, background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 16, boxShadow: C.shadowSm }}>
+            <div style={{ ...typeDataLg, color: C.amber }}>10,000+</div>
+            <div style={{ ...typeLabel, color: C.muted, marginTop: 4 }}>Deals Signed</div>
+          </div>
+          <div style={{ flex: 1, background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 16, boxShadow: C.shadowSm }}>
+            <div style={{ ...typeDataLg, color: C.amber }}>4.9★</div>
+            <div style={{ ...typeLabel, color: C.muted, marginTop: 4 }}>User Rating</div>
+          </div>
+        </div>
+
+        {/* How it works */}
+        <div style={{ marginTop: 48 }}>
+          <div style={{ ...typeLabel, marginBottom: 20 }}>
+            How it works
+          </div>
+          {[
+            { step: "1", title: "Fill in the deal", desc: "Add scope, price, and deadline. Takes under 60 seconds." },
+            { step: "2", title: "Sign & share", desc: "You sign first, then send a WhatsApp link to your client." },
+            { step: "3", title: "Client signs", desc: "They open the link, review, and sign on their phone." },
+            { step: "4", title: "Deal locked", desc: "A permanent, tamper-evident receipt is created for both parties." },
+          ].map(({ step, title, desc }) => (
+            <div
+              key={step}
+              style={{
+                display: "flex",
+                gap: 16,
+                marginBottom: 20,
+                alignItems: "flex-start",
+              }}
+            >
+              <div
+                style={{
+                  ...typeData,
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  background: C.navyMid,
+                  color: "#FFFFFF",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}
+              >
+                {step}
+              </div>
+              <div>
+                <div style={{ ...typeBodyStrong, fontSize: 15, marginBottom: 2 }}>{title}</div>
+                <div style={typeBody}>{desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Testimonial */}
+        <div style={{ marginTop: 48 }}>
+          <div style={{ ...typeLabel, marginBottom: 16 }}>What users say</div>
+          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 20, boxShadow: C.shadowSm }}>
+            <div style={{ ...typeBody, fontStyle: "italic", color: C.ink, fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
+              "Handshake completely changed how I work. No more arguments over what was included in the price. The client signs on their phone before I even start."
+            </div>
+            <div>
+              <div style={{ ...typeBodyStrong, fontSize: 13 }}>Priya Sharma</div>
+              <div style={{ ...typeLabel, textTransform: "none", letterSpacing: "0", fontSize: 12 }}>Freelance Designer</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Dark Band */}
+        <div style={{ background: C.sectionBg, borderRadius: 16, padding: "32px 24px", marginTop: 48, textAlign: "center" }}>
+          <div style={{ fontFamily: C.sans, fontSize: 30, fontWeight: 700, color: C.ink, letterSpacing: "-0.6px" }}>
+            Your agreement.
+          </div>
+          <div style={{ fontFamily: C.sans, fontSize: 30, fontWeight: 700, color: C.amber, letterSpacing: "-0.6px", fontStyle: "italic", marginBottom: 12 }}>
+            Permanent.
+          </div>
+          <div style={{ ...typeBody, color: C.muted, marginBottom: 24 }}>
+            Stop relying on casual WhatsApp messages that get deleted. Get a proper, tamper-evident receipt.
+          </div>
+          <button
+            onClick={onStart}
+            style={{ ...primaryBtn, flex: "none", width: "100%" }}
+          >
+            {t("Start Free →")}
+          </button>
+        </div>
+
+        {/* Target users */}
+        <div style={{ marginTop: 48 }}>
+          <div style={{ ...typeLabel, marginBottom: 16 }}>
+            Built for
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {[
+              { icon: "👷", label: "Electricians" },
+              { icon: "📸", label: "Photographers" },
+              { icon: "☀️", label: "Solar installers" },
+              { icon: "💻", label: "Freelancers" },
+              { icon: "🎨", label: "Designers" },
+              { icon: "🏗️", label: "Contractors" },
+            ].map(({ icon, label }) => (
+              <div
+                key={label}
+                style={{
+                  background: C.card,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 12,
+                  padding: "12px 14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  ...typeBody,
+                  fontWeight: 500,
+                  color: C.ink,
+                  boxShadow: C.shadowSm,
+                }}
+              >
+                <span style={{ fontSize: 20 }}>{icon}</span> {label}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p style={{ textAlign: "center", fontSize: 12, color: C.muted, marginTop: 36 }}>
+          No account needed. No subscription.
+        </p>
+      </div>
+    </div>
+  );
+}
