@@ -333,6 +333,7 @@ function SignaturePad({ onSave, height = 150 }) {
   const drawing = useRef(false);
   const pointsRef = useRef([]);
   const [hasMark, setHasMark] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -435,20 +436,25 @@ function SignaturePad({ onSave, height = 150 }) {
   };
 
   const save = () => {
-    if (hasMark) onSave(canvasRef.current.toDataURL("image/png"));
+    if (hasMark) {
+      setIsConfirming(true);
+      setTimeout(() => onSave(canvasRef.current.toDataURL("image/png")), 500);
+    }
   };
 
   return (
     <div>
       <div
         style={{
-          border: hasMark ? `2px solid ${C.amber}` : `1.5px solid #CBD5E1`,
+          border: isConfirming ? `2px solid ${C.green}` : hasMark ? `2px solid ${C.amber}` : `1.5px solid #CBD5E1`,
+          boxShadow: hasMark && !isConfirming ? 'inset 0 0 0 2px rgba(217,119,6,0.15)' : 'none',
           borderRadius: 14,
           overflow: "hidden",
           background: C.inputBg,
           position: "relative",
           touchAction: "none",
-          transition: "border-color 0.2s",
+          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+          animation: isConfirming ? "signatureConfirm 0.5s 1" : "none",
         }}
       >
         <canvas
@@ -474,6 +480,7 @@ function SignaturePad({ onSave, height = 150 }) {
               color: C.muted,
               pointerEvents: "none",
               gap: 8,
+              animation: "breathe 3s ease-in-out infinite",
             }}
           >
             <span style={{ fontSize: 32 }}>✍️</span>
@@ -586,7 +593,7 @@ function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
             { step: "2", title: "Sign & share", desc: "You sign first, then send a WhatsApp link to your client." },
             { step: "3", title: "Client signs", desc: "They open the link, review, and sign on their phone." },
             { step: "4", title: "Deal locked", desc: "A permanent, tamper-evident receipt is created for both parties." },
-          ].map(({ step, title, desc }) => (
+          ].map(({ step, title, desc }, idx) => (
             <div
               key={step}
               style={{
@@ -594,6 +601,9 @@ function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
                 gap: 16,
                 marginBottom: 20,
                 alignItems: "flex-start",
+                animation: "fadeSlideUp 0.2s ease forwards",
+                opacity: 0,
+                animationDelay: `${idx * 60}ms`,
               }}
             >
               <div
@@ -624,7 +634,7 @@ function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
         {/* Testimonial */}
         <div style={{ marginTop: 48 }}>
           <div style={{ ...typeLabel, marginBottom: 16 }}>What users say</div>
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 20, boxShadow: C.shadowSm }}>
+          <div className="card-interactive" style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 20, boxShadow: C.shadowSm }}>
             <div style={{ ...typeBody, fontStyle: "italic", color: C.ink, fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
               "Handshake completely changed how I work. No more arguments over what was included in the price. The client signs on their phone before I even start."
             </div>
@@ -667,9 +677,10 @@ function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
               { icon: "💻", label: "Freelancers" },
               { icon: "🎨", label: "Designers" },
               { icon: "🏗️", label: "Contractors" },
-            ].map(({ icon, label }) => (
+            ].map(({ icon, label }, idx) => (
               <div
                 key={label}
+                className="card-interactive"
                 style={{
                   background: C.card,
                   border: `1px solid ${C.border}`,
@@ -682,6 +693,9 @@ function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
                   fontWeight: 500,
                   color: C.ink,
                   boxShadow: C.shadowSm,
+                  animation: "fadeSlideUp 0.2s ease forwards",
+                  opacity: 0,
+                  animationDelay: `${idx * 40}ms`,
                 }}
               >
                 <span style={{ fontSize: 20 }}>{icon}</span> {label}
@@ -758,7 +772,8 @@ function CreateAgreement({ onNext, t }) {
             width: s === step ? 22 : 6,
             borderRadius: 3,
             background: s === step ? C.amber : s < step ? C.navyMid : C.border,
-            transition: "all 0.3s",
+            transition: "width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s",
+            animation: s < step ? "confirmEntrance 0.3s forwards" : "none",
           }}
         />
       ))}
@@ -792,7 +807,7 @@ function CreateAgreement({ onNext, t }) {
             ←
           </button>
           <div style={{ flex: 1 }}>
-            <div style={typeHeading}>
+            <div key={step} style={{ ...typeHeading, animation: "fadeSlideUp 0.2s ease forwards" }}>
               {step === 1 ? t("Deal Details") : step === 2 ? t("Scope & Deliverables") : t("Price & Timeline")}
             </div>
             <div style={{ ...typeDataSm, marginTop: 2 }}>
@@ -813,6 +828,7 @@ function CreateAgreement({ onNext, t }) {
               {Object.keys(TEMPLATES).map(prof => (
                 <button
                   key={prof}
+                  className="card-interactive"
                   onClick={() => handleSelectTemplate(prof)}
                   style={{
                     padding: "6px 12px",
@@ -1183,7 +1199,7 @@ function ShareScreen({ token, agreement, onSimulateClient, t }) {
     <div style={{ minHeight: "100vh", background: C.bg }}>
       <div style={{ maxWidth: 420, margin: "0 auto", padding: "32px 20px 60px" }}>
         <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ fontSize: 64, marginBottom: 12 }}>🎉</div>
+          <div style={{ fontSize: 64, marginBottom: 12, animation: "dropBounce 0.5s forwards", animationDelay: "0.1s", opacity: 0 }}>🎉</div>
           <div style={{ ...typeHeadingLg, marginBottom: 8 }}>
             Agreement Created!
           </div>
@@ -1585,6 +1601,7 @@ function ClientSign({ agreement, onAccept, t }) {
             
             <button
               onClick={() => onAccept(sig, email)}
+              className="lock-deal-btn"
               style={{ ...confirmBtn, fontSize: 17, padding: "18px 24px" }}
             >
               🔒 {t("Lock Deal — I Accept →")}
@@ -1601,6 +1618,7 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
   const hash = makeHash({ agreement: { ...agreement, deliverables: agreement.deliverables.filter((d) => d.trim()) }, token, ts: timestamps });
 
   const [showEmailToast, setShowEmailToast] = useState(!!(creatorEmail || clientEmail));
+  const [isExitingToast, setIsExitingToast] = useState(false);
   const [isPaidAdvance, setIsPaidAdvance] = useState(false);
   
   const [showCoForm, setShowCoForm] = useState(false);
@@ -1611,7 +1629,10 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
 
   useEffect(() => {
     if (showEmailToast) {
-      const timer = setTimeout(() => setShowEmailToast(false), 3000);
+      const timer = setTimeout(() => {
+        setIsExitingToast(true);
+        setTimeout(() => setShowEmailToast(false), 200);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [showEmailToast]);
@@ -1619,8 +1640,10 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
   return (
     <div style={{ minHeight: "100vh", background: C.sectionBg }}>
       {showEmailToast && (
-        <div style={{ position: "fixed", top: 16, left: "50%", transform: "translateX(-50%)", background: C.green, color: "white", padding: "10px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600, zIndex: 100, boxShadow: C.shadowSm }}>
-          {t("Receipt sent to your email ✓")}
+        <div style={{ position: "fixed", top: 16, left: 0, right: 0, zIndex: 1000 }}>
+          <div style={{ maxWidth: 420, margin: "12px auto", width: "max-content", background: C.green, color: "white", padding: "10px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600, boxShadow: C.shadowSm, animation: isExitingToast ? "toastExit 0.2s ease forwards" : "toastEnter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards" }}>
+            {t("Receipt sent to your email ✓")}
+          </div>
         </div>
       )}
       <div style={{ maxWidth: 420, margin: "0 auto", padding: "20px 20px 60px" }}>
@@ -1633,6 +1656,9 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
             marginBottom: 20,
             border: `2px solid ${C.greenBorder}`,
             textAlign: "center",
+            animation: "confirmEntrance 0.4s forwards",
+            animationDelay: "0.1s",
+            opacity: 0,
           }}
         >
           <div style={{ fontSize: 48, marginBottom: 10 }}>🤝</div>
@@ -1692,7 +1718,7 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
             { label: "Client Signed", value: fmtDate(timestamps.signed) },
           ]
             .filter(Boolean)
-            .map(({ label, value, highlight }) => (
+            .map(({ label, value, highlight }, idx) => (
               <div
                 key={label}
                 style={{
@@ -1701,6 +1727,9 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
                   alignItems: "center",
                   marginBottom: 12,
                   gap: 12,
+                  animation: "fadeSlideUp 0.2s ease forwards",
+                  opacity: 0,
+                  animationDelay: `${idx * 50}ms`
                 }}
               >
                 <span style={typeLabel}>{label}</span>
@@ -2107,7 +2136,7 @@ function Payment({ agreement, token, onSuccess, onBack }) {
         }}
       >
         <div style={{ textAlign: "center", padding: 40 }}>
-          <div style={{ fontSize: 64, marginBottom: 16 }}>✅</div>
+          <div style={{ fontSize: 64, marginBottom: 16, animation: "dropBounce 0.45s forwards" }}>✅</div>
           <div style={{ ...typeHeading, marginBottom: 8 }}>
             Payment Successful!
           </div>
@@ -2355,8 +2384,8 @@ function Dashboard({ onBack, onOpenDeal }) {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 24 }}>
-            {deals.map(deal => (
-              <div key={deal.token} style={{ background: C.card, borderRadius: 16, padding: 16, border: `1px solid ${C.border}`, boxShadow: C.shadowSm }}>
+            {deals.map((deal, idx) => (
+              <div key={deal.token} className="card-interactive" style={{ background: C.card, borderRadius: 16, padding: 16, border: `1px solid ${C.border}`, boxShadow: C.shadowSm, animation: "fadeSlideUp 0.2s ease forwards", opacity: 0, animationDelay: `${idx * 50}ms` }}>
                 <div style={{ ...typeBodyStrong, marginBottom: 4 }}>{deal.projectTitle}</div>
                 <div style={{ ...typeBody, fontSize: 13, marginBottom: 8 }}>{deal.clientName}</div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
@@ -2396,6 +2425,7 @@ function Dashboard({ onBack, onOpenDeal }) {
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [screen, setScreen] = useState("landing");
+  const [screenKey, setScreenKey] = useState(0);
   const [agreement, setAgreement] = useState(null);
   const [creatorSig, setCreatorSig] = useState(null);
   const [clientSig, setClientSig] = useState(null);
@@ -2430,11 +2460,82 @@ export default function App() {
     
     const style = document.createElement("style");
     style.innerHTML = `
+      button:active {
+        transform: scale(0.96);
+        transition: transform 0.07s ease;
+        opacity: 0.92;
+      }
+      button {
+        transition: transform 0.12s ease, opacity 0.12s ease,
+                    background-color 0.15s ease, box-shadow 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
       input:focus, textarea:focus, select:focus {
         border-color: ${C.amber} !important;
         box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12) !important;
         outline: none !important;
         background: #FFFFFF !important;
+        transform: scale(1.005);
+        transition: transform 0.15s ease;
+      }
+      .card-interactive:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.13);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .screen-root {
+        animation: screenEnter 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
+      @keyframes screenEnter {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes breathe {
+        0%, 100% { opacity: 0.45; }
+        50%       { opacity: 0.75; }
+      }
+      @keyframes signatureConfirm {
+        0%   { box-shadow: 0 0 0 0 rgba(5,150,105,0.5); }
+        50%  { box-shadow: 0 0 0 10px rgba(5,150,105,0); }
+        100% { box-shadow: 0 0 0 0 rgba(5,150,105,0); }
+      }
+      @keyframes dropBounce {
+        0%   { transform: translateY(-24px) scale(0.8); opacity: 0; }
+        60%  { transform: translateY(4px) scale(1.05);  opacity: 1; }
+        80%  { transform: translateY(-2px) scale(0.98); }
+        100% { transform: translateY(0) scale(1); opacity: 1; }
+      }
+      @keyframes confirmEntrance {
+        0%   { transform: scale(0.95) translateY(6px); opacity: 0; }
+        70%  { transform: scale(1.01) translateY(-1px); opacity: 1; }
+        100% { transform: scale(1) translateY(0); opacity: 1; }
+      }
+      .lock-deal-btn:active {
+        transform: scale(0.94) !important;
+        transition: transform 0.07s ease !important;
+      }
+      .lock-deal-btn {
+        transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+      }
+      @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes toastEnter {
+        from { transform: translateY(-100%); opacity: 0; }
+        to   { transform: translateY(0);     opacity: 1; }
+      }
+      @keyframes toastExit {
+        from { transform: translateY(0);    opacity: 1; }
+        to   { transform: translateY(-20px); opacity: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -2447,6 +2548,7 @@ export default function App() {
 
   const go = useCallback((s) => {
     setScreen(s);
+    setScreenKey(k => k + 1);
     window.history.pushState({ screen: s }, "", `#${s}`);
   }, []);
 
@@ -2454,12 +2556,15 @@ export default function App() {
     const handlePopState = (e) => {
       if (e.state && e.state.screen) {
         setScreen(e.state.screen);
+        setScreenKey(k => k + 1);
       } else {
         const hash = window.location.hash.replace("#", "");
         if (hash) {
           setScreen(hash);
+          setScreenKey(k => k + 1);
         } else {
           setScreen("landing");
+          setScreenKey(k => k + 1);
         }
       }
     };
@@ -2469,6 +2574,7 @@ export default function App() {
     const initialHash = window.location.hash.replace("#", "");
     if (initialHash) {
       setScreen(initialHash);
+      setScreenKey(k => k + 1);
     } else {
       window.history.replaceState({ screen: "landing" }, "", "#landing");
     }
@@ -2484,10 +2590,15 @@ export default function App() {
   const handleCreatorSigned = (sig, email) => {
     setCreatorSig(sig);
     if (email) setCreatorEmail(email);
-    const t = genToken();
-    setToken(t);
-    setTimestamps((ts) => ({ ...ts, created: Date.now() }));
-    go("share");
+    setScreen("creating");
+    setScreenKey(k => k + 1);
+    
+    setTimeout(() => {
+      const t = genToken();
+      setToken(t);
+      setTimestamps((ts) => ({ ...ts, created: Date.now() }));
+      go("share");
+    }, 1500);
   };
 
   const handleClientAccepted = (sig, email) => {
@@ -2535,6 +2646,24 @@ export default function App() {
     create: <CreateAgreement onNext={handleCreateDone} t={t} />,
     creatorSign: agreement && (
       <CreatorSign agreement={agreement} onNext={handleCreatorSigned} t={t} />
+    ),
+    creating: (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "80vh", textAlign: "left" }}>
+        <div style={{ ...typeBrand, color: C.ink, fontSize: 24, marginBottom: 40, display: "flex", alignItems: "center", gap: 10 }}>
+          <span>🤝</span> Handshake
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ animation: "fadeSlideUp 0.2s ease forwards", opacity: 0, animationDelay: "0ms", fontSize: 15, color: C.ink, fontFamily: C.sans }}>
+            <span style={{ color: C.green, marginRight: 8 }}>✓</span> Agreement details saved
+          </div>
+          <div style={{ animation: "fadeSlideUp 0.2s ease forwards", opacity: 0, animationDelay: "400ms", fontSize: 15, color: C.ink, fontFamily: C.sans }}>
+            <span style={{ color: C.green, marginRight: 8 }}>✓</span> Signatures recorded
+          </div>
+          <div style={{ animation: "fadeSlideUp 0.2s ease forwards", opacity: 0, animationDelay: "850ms", fontSize: 15, color: C.ink, fontFamily: C.sans }}>
+            <span style={{ color: C.green, marginRight: 8 }}>✓</span> Fingerprint generated
+          </div>
+        </div>
+      </div>
     ),
     share: token && agreement && (
       <ShareScreen
@@ -2658,7 +2787,9 @@ export default function App() {
           {renderNavRight()}
         </div>
       </nav>
-      {screens[screen] || screens.landing}
+      <div className="screen-root" key={screenKey}>
+        {screens[screen] || screens.landing}
+      </div>
     </div>
   );
 }
