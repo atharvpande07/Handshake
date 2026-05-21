@@ -863,7 +863,7 @@ function CreateAgreement({ onNext, t }) {
             </div>
             <button
               onClick={() => canNext1 && setStep(2)}
-              style={{ ...primaryBtn, flex: "none", width: "100%", opacity: canNext1 ? 1 : 0.45 }}
+              style={{ ...primaryBtn, flex: "none", width: "100%", opacity: canNext1 ? 1 : 0.6, cursor: canNext1 ? "pointer" : "not-allowed" }}
             >
               {t("Continue →")}
             </button>
@@ -906,7 +906,7 @@ function CreateAgreement({ onNext, t }) {
                   >
                     {i + 1}
                   </div>
-                  <input
+                  <textarea
                     style={{
                       flex: 1,
                       border: "none",
@@ -917,7 +917,9 @@ function CreateAgreement({ onNext, t }) {
                       fontFamily: C.sans,
                       color: C.ink,
                       width: "100%",
+                      resize: "none",
                     }}
+                    rows={2}
                     value={d}
                     onChange={(e) => setDel(i, e.target.value)}
                     placeholder={`Deliverable ${i + 1}`}
@@ -950,7 +952,7 @@ function CreateAgreement({ onNext, t }) {
             {form.deliverables.length === 5 && <div style={{ height: 20 }} />}
             <button
               onClick={() => canNext2 && setStep(3)}
-              style={{ ...primaryBtn, flex: "none", width: "100%", opacity: canNext2 ? 1 : 0.45 }}
+              style={{ ...primaryBtn, flex: "none", width: "100%", opacity: canNext2 ? 1 : 0.6, cursor: canNext2 ? "pointer" : "not-allowed" }}
             >
               {t("Continue →")}
             </button>
@@ -965,9 +967,9 @@ function CreateAgreement({ onNext, t }) {
             </p>
             <div style={{ marginBottom: 16 }}>
               <Label>{t("Total price *")}</Label>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ ...inputStyle, display: "flex", padding: 0, overflow: "hidden" }}>
                 <select
-                  style={{ ...inputStyle, width: 70, flex: "none" }}
+                  style={{ border: "none", background: C.sectionBg, padding: "0 16px", outline: "none", cursor: "pointer", borderRight: `1px solid ${C.border}`, flex: "none", width: 70, color: C.ink, fontSize: 15, fontFamily: C.sans, WebkitAppearance: "none" }}
                   value={form.currency}
                   onChange={(e) => set("currency", e.target.value)}
                 >
@@ -976,7 +978,7 @@ function CreateAgreement({ onNext, t }) {
                   ))}
                 </select>
                 <input
-                  style={{ ...inputStyle, ...typeDataMd }}
+                  style={{ flex: 1, border: "none", background: "transparent", padding: "14px 16px", outline: "none", color: C.ink, fontSize: 15, fontFamily: C.sans, ...typeDataMd }}
                   type="number"
                   value={form.price}
                   onChange={(e) => set("price", e.target.value)}
@@ -988,10 +990,10 @@ function CreateAgreement({ onNext, t }) {
             
             <div style={{ marginBottom: 16 }}>
               <Label>Advance amount (optional)</Label>
-              <div style={{ display: "flex", gap: 8 }}>
-                <div style={{ ...inputStyle, width: 70, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", background: C.sectionBg }}>{form.currency}</div>
+              <div style={{ ...inputStyle, display: "flex", padding: 0, overflow: "hidden" }}>
+                <div style={{ width: 70, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", background: C.sectionBg, borderRight: `1px solid ${C.border}` }}>{form.currency}</div>
                 <input
-                  style={{ ...inputStyle, ...typeDataMd }}
+                  style={{ flex: 1, border: "none", background: "transparent", padding: "14px 16px", outline: "none", color: C.ink, fontSize: 15, fontFamily: C.sans, ...typeDataMd }}
                   type="number"
                   value={form.advanceAmount}
                   onChange={(e) => set("advanceAmount", e.target.value)}
@@ -1035,7 +1037,8 @@ function CreateAgreement({ onNext, t }) {
                 ...primaryBtn,
                 flex: "none",
                 width: "100%",
-                opacity: canNext3 ? 1 : 0.45,
+                opacity: canNext3 ? 1 : 0.6,
+                cursor: canNext3 ? "pointer" : "not-allowed",
               }}
             >
               Sign & Create Agreement →
@@ -1522,7 +1525,7 @@ function ClientSign({ agreement, onAccept, t }) {
         </div>
         <p style={{ ...typeBody, marginBottom: 12 }}>
           Draw your signature below to confirm your agreement with{" "}
-          <strong style={{ color: C.ink }}>"{agreement.projectTitle}"</strong>.
+          <strong style={{ color: C.ink }}>"{agreement.projectTitle.trim()}"</strong>.
         </p>
 
         <div
@@ -1872,8 +1875,8 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
         
         {/* Add Change Order */}
         {!showCoForm && !coDone ? (
-          <button onClick={() => setShowCoForm(true)} style={{ ...outlineBtn, width: "100%", marginBottom: 16 }}>
-            {t("Add Change Order")}
+          <button onClick={() => setShowCoForm(true)} style={{ ...outlineBtn, width: "100%", marginBottom: 16, border: '1.5px solid #CBD5E1', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <span>+</span> {t("Add Change Order")}
           </button>
         ) : showCoForm ? (
           <div style={{ background: C.card, borderRadius: 16, padding: 20, marginBottom: 16, border: `1px solid ${C.border}` }}>
@@ -1969,8 +1972,11 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
             >
               <div>
                 <span
-                  className="text-slate-900 font-mono text-xl tracking-tight"
-                  style={typePrice}
+                  style={{
+                    ...typePrice,
+                    fontSize: 32,
+                    color: C.amber,
+                  }}
                 >
                   ₹49
                 </span>
