@@ -442,7 +442,7 @@ function SignaturePad({ onSave, height = 150 }) {
     <div>
       <div
         style={{
-          border: `2px dashed ${hasMark ? C.amber : C.border}`,
+          border: hasMark ? `2px solid ${C.amber}` : `1.5px solid #CBD5E1`,
           borderRadius: 14,
           overflow: "hidden",
           background: C.inputBg,
@@ -501,41 +501,6 @@ function SignaturePad({ onSave, height = 150 }) {
 function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
   return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
-      <nav
-        style={{
-          padding: "16px 24px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderBottom: `1px solid ${C.border}`,
-          background: C.navy,
-        }}
-      >
-        <div style={{ ...typeBrand, color: "#FFFFFF", display: "flex", alignItems: "center", gap: 8 }}>
-          <span>🤝</span> Handshake
-        </div>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <button onClick={toggleLanguage} style={{ ...outlineBtn, fontSize: 12, padding: "6px 14px", color: "#FFFFFF", borderColor: C.navyLight, background: "transparent" }}>
-            {language === "hi" ? "EN | हिंदी" : "हिंदी | EN"}
-          </button>
-          <button onClick={onDashboard} style={{ ...ghostBtn, color: "rgba(255,255,255,0.75)", fontSize: 12 }}>
-            My Deals →
-          </button>
-          <span
-            style={{
-              ...typeLabel,
-              color: C.navyText,
-              background: C.amberLight,
-              padding: "5px 12px",
-              borderRadius: 20,
-              border: `1px solid ${C.amberBorder}`,
-            }}
-          >
-            {t("Free · No account")}
-          </span>
-        </div>
-      </nav>
-
       <div style={{ flex: 1, maxWidth: 420, margin: "0 auto", padding: "40px 24px 60px", width: "100%" }}>
         {/* Hero */}
         <div style={{ marginBottom: 10 }}>
@@ -569,6 +534,20 @@ function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
         >
           {t("Get Started →")}
         </button>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
+          <span
+            style={{
+              ...typeLabel,
+              color: C.navyText,
+              background: C.amberLight,
+              padding: "5px 12px",
+              borderRadius: 20,
+              border: `1px solid ${C.amberBorder}`,
+            }}
+          >
+            {t("Free · No account")}
+          </span>
+        </div>
         <div
           style={{
             marginTop: 14,
@@ -1347,32 +1326,6 @@ function ClientView({ agreement, creatorSig, token, changeOrders = [], onSign, o
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
-      {/* Client-facing header */}
-      <div
-        style={{
-          background: C.navy,
-          padding: "14px 20px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <span style={{ ...typeBrand, color: "#FFFFFF" }}>
-          🤝 Handshake
-        </span>
-        <span
-          style={{
-            ...typeLabel,
-            color: "#9CA3AF",
-            background: "rgba(255,255,255,0.08)",
-            padding: "4px 10px",
-            borderRadius: 20,
-          }}
-        >
-          Deal Receipt
-        </span>
-      </div>
-
       <div style={{ maxWidth: 420, margin: "0 auto", padding: "20px 20px 60px" }}>
         {/* Action banner */}
         {activeCo ? (
@@ -1667,34 +1620,6 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
           {t("Receipt sent to your email ✓")}
         </div>
       )}
-      <div
-        style={{
-          background: C.navy,
-          padding: "14px 20px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <span style={{ ...typeBrand, color: "#FFFFFF" }}>
-          🤝 Handshake
-        </span>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            background: C.green,
-            padding: "5px 14px",
-            borderRadius: 20,
-          }}
-        >
-          <span style={{ color: "#FFFFFF", fontSize: 12, fontWeight: 700, fontFamily: C.sans }}>
-            🔒 DEAL LOCKED
-          </span>
-        </div>
-      </div>
-
       <div style={{ maxWidth: 420, margin: "0 auto", padding: "20px 20px 60px" }}>
         {/* Success banner */}
         <div
@@ -1865,7 +1790,9 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
               marginTop: 16,
             }}
           >
-            <Label>Fingerprint</Label>
+            <div style={{ ...typeLabel, marginBottom: 8, display: 'flex', alignItems: 'center', gap: '4px', textTransform: 'none' }}>
+              <span>🔒</span> Handshake Verified Hash
+            </div>
             <div
               style={{
                 ...typeData,
@@ -1877,6 +1804,10 @@ function Receipt({ agreement, creatorSig, clientSig, token, timestamps, isPaid, 
                 wordBreak: "break-all",
                 lineHeight: 1.4,
                 marginBottom: 4,
+                backgroundColor: "#F8FAFC",
+                border: "1px solid #E2E8F0",
+                padding: "12px",
+                borderRadius: "8px"
               }}
             >
               {hash}
@@ -2648,6 +2579,51 @@ export default function App() {
     ),
   };
 
+  const renderNavRight = () => {
+    if (screen === 'landing') {
+      return (
+        <button onClick={() => go("dashboard")} style={{ ...ghostBtn, color: "rgba(255,255,255,0.75)", fontSize: 12 }}>
+          My Deals →
+        </button>
+      );
+    }
+    if (screen === 'clientView') {
+      return (
+        <span
+          style={{
+            ...typeLabel,
+            color: C.amber,
+            background: "transparent",
+            border: `1px solid ${C.amber}`,
+            padding: "4px 10px",
+            borderRadius: 20,
+          }}
+        >
+          Deal Receipt
+        </span>
+      );
+    }
+    if (screen === 'receipt') {
+      return (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: C.green,
+            padding: "5px 14px",
+            borderRadius: 20,
+          }}
+        >
+          <span style={{ color: "#FFFFFF", fontSize: 12, fontWeight: 700, fontFamily: C.sans }}>
+            🔒 DEAL LOCKED
+          </span>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div
       style={{
@@ -2656,6 +2632,26 @@ export default function App() {
         minHeight: "100vh",
       }}
     >
+      <nav
+        style={{
+          padding: "16px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: `1px solid ${C.border}`,
+          background: C.navy,
+        }}
+      >
+        <div style={{ ...typeBrand, color: "#FFFFFF", display: "flex", alignItems: "center", gap: 8 }}>
+          <span>🤝</span> Handshake
+        </div>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <button onClick={toggleLanguage} style={{ ...outlineBtn, fontSize: 12, padding: "6px 14px", color: "#FFFFFF", borderColor: C.navyLight, background: "transparent" }}>
+            {language === "hi" ? "EN | हिंदी" : "हिंदी | EN"}
+          </button>
+          {renderNavRight()}
+        </div>
+      </nav>
       {screens[screen] || screens.landing}
     </div>
   );
