@@ -1,0 +1,197 @@
+import React, { useState } from 'react';
+import { C, typeBodyStrong, typeHeadingLg, typePrice, typeBody, typeHeading, typeHeadingSm, confirmBtn, outlineBtn, ghostBtn } from '../constants/theme';
+import { fmtDeadline } from '../utils/helpers';
+import Label from '../components/Label';
+import SignaturePad from '../components/SignaturePad';
+
+export default function ClientView({ agreement, creatorSig, token, changeOrders = [], onSign, onSignChangeOrder, t }) {
+  const unsignedCoIndex = changeOrders.findIndex((co) => !co.clientSig);
+  const activeCo = unsignedCoIndex >= 0 ? changeOrders[unsignedCoIndex] : null;
+  const [coSig, setCoSig] = useState(null);
+
+  const handlePayUPI = () => {
+    if (agreement.upiId.startsWith("http")) {
+      window.open(agreement.upiId, "_blank");
+    } else {
+      window.location.href = `upi://pay?pa=${agreement.upiId}&am=${agreement.advanceAmount}&cu=INR`;
+    }
+  };
+
+  const handleCopyUPI = () => {
+    navigator.clipboard.writeText(agreement.upiId).catch(() => {});
+    alert("Copied!");
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg }}>
+      <div style={{ maxWidth: 420, margin: "0 auto", padding: "20px 20px 60px" }}>
+        {/* Action banner */}
+        {activeCo ? (
+          <div style={{ background: C.amberLight, border: `1.5px solid ${C.amberBorder}`, borderRadius: 12, padding: "12px 16px", marginBottom: 20 }}>
+            <div style={{ ...typeBodyStrong, fontSize: 14, color: C.amberDark }}>
+              ⚠️ A change order has been added. Please review and sign below.
+            </div>
+          </div>
+        ) : (
+          <div style={{ background: C.amberLight, border: `1.5px solid ${C.amberBorder}`, borderRadius: 12, padding: "12px 16px", marginBottom: 20 }}>
+            <div style={{ ...typeBodyStrong, fontSize: 14, color: C.amberDark }}>
+              ✋ Review this agreement and sign to accept
+            </div>
+          </div>
+        )}
+
+        {/* Main card */}
+        <div
+          style={{
+            background: C.card,
+            borderRadius: 16,
+            padding: 24,
+            marginBottom: 16,
+            border: `1px solid ${C.border}`,
+            boxShadow: C.shadowLg,
+          }}
+        >
+          {/* Title & price */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              marginBottom: 20,
+              gap: 12,
+            }}
+          >
+            <div style={{ flex: 1 }}>
+              <Label>Service Agreement</Label>
+              <div style={typeHeadingLg}>
+                {agreement.projectTitle}
+              </div>
+            </div>
+            <div className="text-slate-900 font-mono text-xl tracking-tight" style={{ ...typePrice, flexShrink: 0 }}>
+              {agreement.currency}
+              {Number(agreement.price).toLocaleString("en-IN")}
+            </div>
+          </div>
+
+          {/* Client */}
+          <div style={{ borderTop: `1px solid ${C.divider}`, paddingTop: 16, marginBottom: 16 }}>
+            <Label>Client</Label>
+            <div style={{ ...typeBodyStrong, fontSize: 16 }}>{agreement.clientName}</div>
+          </div>
+
+          {/* Deadline */}
+          {agreement.deadline && (
+            <div style={{ borderTop: `1px solid ${C.divider}`, paddingTop: 16, marginBottom: 16 }}>
+              <Label>Delivery Date</Label>
+              <div style={{ ...typeBodyStrong, fontSize: 15 }}>
+                {fmtDeadline(agreement.deadline)}
+              </div>
+            </div>
+          )}
+
+          {/* Deliverables */}
+          <div style={{ borderTop: `1px solid ${C.divider}`, paddingTop: 16, marginBottom: agreement.notes ? 16 : 0 }}>
+            <Label>What's Included</Label>
+            {agreement.deliverables
+              .filter((d) => d.trim())
+              .map((d, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
+                  <span style={{ color: C.green, fontWeight: 700, fontSize: 14, marginTop: 2, flexShrink: 0 }}>✓</span>
+                  <span style={{ ...typeBody, color: C.ink, fontSize: 14 }}>{d}</span>
+                </div>
+              ))}
+          </div>
+
+          {/* Notes */}
+          {agreement.notes && (
+            <div style={{ borderTop: `1px solid ${C.divider}`, paddingTop: 16 }}>
+              <Label>Notes & Terms</Label>
+              <div style={typeBody}>{agreement.notes}</div>
+            </div>
+          )}
+        </div>
+
+        {/* Change Orders List */}
+        {changeOrders.length > 0 && (
+          <div style={{ background: C.card, borderRadius: 16, padding: 24, marginBottom: 16, border: `1px solid ${C.border}`, boxShadow: C.shadowSm }}>
+            <div style={{ ...typeHeading, marginBottom: 16 }}>Change Orders</div>
+            {changeOrders.map((co, idx) => (
+              <div key={idx} style={{ marginBottom: idx < changeOrders.length - 1 ? 24 : 0, paddingBottom: idx < changeOrders.length - 1 ? 24 : 0, borderBottom: idx < changeOrders.length - 1 ? `1px solid ${C.divider}` : "none" }}>
+                <div style={{ ...typeBodyStrong, fontSize: 15, marginBottom: 8 }}>{co.description}</div>
+                {co.extraPrice && <div className="text-slate-900 font-mono text-xl tracking-tight" style={{ ...typePrice, marginBottom: 12 }}>+ {agreement.currency}{Number(co.extraPrice).toLocaleString("en-IN")}</div>}
+                <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <Label>Provider</Label>
+                    <img src={co.creatorSig} alt="Creator sig" style={{ height: 40, width: "100%", objectFit: "contain", border: `1px solid ${C.border}`, borderRadius: 8, padding: 4 }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Label>Client</Label>
+                    {co.clientSig ? (
+                      <img src={co.clientSig} alt="Client sig" style={{ height: 40, width: "100%", objectFit: "contain", border: `1px solid ${C.border}`, borderRadius: 8, padding: 4 }} />
+                    ) : (
+                      <div style={{ height: 40, border: `1px dashed ${C.border}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", ...typeBody, fontSize: 12 }}>Pending</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Creator sig */}
+        <div style={{ background: C.card, borderRadius: 16, padding: 16, marginBottom: 16, border: `1px solid ${C.border}`, boxShadow: C.shadowSm }}>
+          <Label>Signed by Service Provider</Label>
+          <img src={creatorSig} alt="creator signature" style={{ height: 70, maxWidth: "100%", objectFit: "contain" }} />
+        </div>
+        
+        {/* UPI Payment Card */}
+        {agreement.upiId && Number(agreement.advanceAmount) > 0 && (
+          <div style={{ background: C.card, borderRadius: 16, padding: 20, marginBottom: 24, border: `1px solid ${C.border}`, boxShadow: C.shadowLg }}>
+            <div style={{ ...typeHeadingSm, marginBottom: 12 }}>
+              Pay <span className="text-slate-900 font-mono text-xl tracking-tight" style={typePrice}>{agreement.currency}{Number(agreement.advanceAmount).toLocaleString("en-IN")}</span> advance before signing
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={handlePayUPI} style={{ ...confirmBtn, flex: 1, padding: "14px" }}>Pay Advance →</button>
+              <button onClick={handleCopyUPI} style={{ ...outlineBtn, flex: "none", padding: "14px" }}>Copy</button>
+            </div>
+            <div style={{ ...typeBody, fontSize: 12, marginTop: 12, textAlign: "center" }}>
+              You can pay via any UPI app — GPay, PhonePe, Paytm
+            </div>
+          </div>
+        )}
+
+        {/* Action area */}
+        {activeCo ? (
+          <div style={{ background: C.card, borderRadius: 16, padding: 20, border: `1px solid ${C.border}`, boxShadow: C.shadowSm }}>
+            <div style={{ ...typeHeadingSm, marginBottom: 16 }}>Sign Change Order</div>
+            {!coSig ? (
+              <SignaturePad onSave={setCoSig} height={120} />
+            ) : (
+              <>
+                <img src={coSig} alt="co sig" style={{ height: 80, width: "100%", objectFit: "contain", border: `1px solid ${C.border}`, borderRadius: 8, marginBottom: 16 }} />
+                <button onClick={() => setCoSig(null)} style={{ ...ghostBtn, width: "100%", marginBottom: 12 }}>Re-draw</button>
+                <button onClick={() => onSignChangeOrder(coSig, unsignedCoIndex)} style={{ ...confirmBtn, padding: "16px" }}>Sign Change Order →</button>
+              </>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* Trust note */}
+            <div style={{ background: C.greenLight, borderRadius: 14, padding: "14px 16px", marginBottom: 24, border: `1.5px solid ${C.greenBorder}` }}>
+              <div style={{ ...typeBodyStrong, fontSize: 14, color: C.greenText, marginBottom: 4 }}>
+                🔒 Your signature locks this deal
+              </div>
+              <div style={{ ...typeBody, fontSize: 13, color: C.greenText }}>
+                A tamper-evident record will be created. This is a deal confirmation, not a legal contract.
+              </div>
+            </div>
+
+            <button onClick={onSign} style={{ ...confirmBtn, fontSize: 17, padding: "18px 24px" }}>
+              ✍️ Review & Sign Deal →
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,27 @@
+export const TRANSLATIONS = {
+  en: {},
+  hi: {
+    "Create Agreement — Free →": "मुफ्त में डील बनाएं →",
+    "Continue →": "आगे बढ़ें →",
+    "Use Signature →": "हस्ताक्षर लगाएं →",
+    "Create & Share Agreement →": "डील बनाएं और शेयर करें →",
+    "Lock Deal — I Accept →": "डील लॉक करें — मैं सहमत हूं →",
+    "Get PDF — ₹49 →": "PDF डाउनलोड करें — ₹49 →",
+    "Add Change Order": "बदलाव जोड़ें",
+    "Client's full name *": "क्लाइंट का नाम *",
+    "Project / service title *": "प्रोजेक्ट / सेवा का नाम *",
+    "Total price *": "कुल कीमत *",
+    "Delivery deadline": "डिलीवरी की तारीख",
+    "Notes / payment terms (optional)": "नोट्स / पेमेंट की शर्तें (optional)",
+    "Your email (optional — we'll send you a copy of the receipt)": "आपका ईमेल (optional — we'll send you a copy of the receipt)",
+    "What's Included": "क्या शामिल है",
+    "Deal Details": "डील की जानकारी",
+    "Scope & Deliverables": "काम का दायरा",
+    "Price & Timeline": "कीमत और समयसीमा",
+    "Add Your Signature": "अपने हस्ताक्षर करें",
+    "Agreement Created!": "डील बन गई!",
+    "Deal Confirmed!": "डील पक्की हो गई!",
+    "Waiting for client signature": "क्लाइंट के हस्ताक्षर का इंतज़ार",
+    "Draw your signature here": "यहाँ हस्ताक्षर करें",
+  }
+};
