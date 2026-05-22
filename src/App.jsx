@@ -50,6 +50,13 @@ export default function App() {
     
     const style = document.createElement("style");
     style.innerHTML = `
+      * {
+        box-sizing: border-box;
+      }
+      html, body {
+        overflow-x: hidden;
+        width: 100%;
+      }
       button:active {
         transform: scale(0.96);
         transition: transform 0.07s ease;
