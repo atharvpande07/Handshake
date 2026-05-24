@@ -1,209 +1,286 @@
 import React from 'react';
-import { C, typeLabel, typeHeadingLg, typeBodyLg, primaryBtn, typeBody, typeDataLg, typeData, typeBodyStrong } from '../constants/theme';
+import { motion } from 'framer-motion';
+import { ArrowRight, CheckCircle2, Shield, Zap, Smartphone, Lock, Play, FileText, Check } from 'lucide-react';
 
 export default function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
-      <div style={{ flex: 1, maxWidth: 420, margin: "0 auto", padding: "40px 24px 60px", width: "100%" }}>
-        {/* Hero */}
-        <div style={{ marginBottom: 10 }}>
-          <span style={{ ...typeLabel, color: C.amber }}>
-            For freelancers & small businesses
-          </span>
-        </div>
-        <h1
-          style={{
-            ...typeHeadingLg,
-            fontSize: 38,
-            letterSpacing: "-0.8px",
-            lineHeight: 1.15,
-            marginBottom: 20,
-          }}
-        >
-          Close deals.
-          <br />
-          No more scope
-          <br />
-          <em style={{ color: C.amber, fontStyle: "normal" }}>disputes.</em>
-        </h1>
-        <p style={{ ...typeBodyLg, marginBottom: 36, maxWidth: 340 }}>
-          Create a simple agreement in 60 seconds. Share on WhatsApp. Get it
-          signed. Keep a clean, tamper-evident record.
-        </p>
-
-        <button
-          onClick={onStart}
-          style={{ ...primaryBtn, flex: "none", width: "100%", fontSize: 17, padding: "18px 24px" }}
-        >
-          {t("Get Started →")}
-        </button>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
-          <span
-            style={{
-              ...typeLabel,
-              color: C.navyText,
-              background: C.amberLight,
-              padding: "5px 12px",
-              borderRadius: 20,
-              border: `1px solid ${C.amberBorder}`,
-            }}
+    <div className="min-h-screen bg-bg text-white selection:bg-primary/30 font-sans overflow-x-hidden">
+      {/* 1. Hero Section */}
+      <section className="relative pt-20 pb-32 lg:pt-32 lg:pb-40 px-6 max-w-7xl mx-auto">
+        {/* Background glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[120px] opacity-50 pointer-events-none" />
+        
+        <div className="relative grid lg:grid-cols-2 gap-16 lg:gap-8 items-center">
+          <motion.div 
+            initial="hidden" animate="visible" variants={staggerContainer}
+            className="max-w-2xl"
           >
-            {t("Free · No account")}
-          </span>
-        </div>
-        <div
-          style={{
-            marginTop: 14,
-            display: "flex",
-            gap: 16,
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          {["⚡ Under 60 seconds", "📱 WhatsApp-ready", "🔒 Tamper-evident"].map((text) => (
-            <span key={text} style={{ ...typeBody, fontSize: 12, fontWeight: 500 }}>
-              {text}
-            </span>
-          ))}
-        </div>
-
-        {/* Stats */}
-        <div style={{ display: "flex", gap: 16, marginTop: 36, marginBottom: 16 }}>
-          <div style={{ flex: 1, background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 16, boxShadow: C.shadowSm }}>
-            <div style={{ ...typeDataLg, color: C.amber }}>10,000+</div>
-            <div style={{ ...typeLabel, color: C.muted, marginTop: 4 }}>Deals Signed</div>
-          </div>
-          <div style={{ flex: 1, background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 16, boxShadow: C.shadowSm }}>
-            <div style={{ ...typeDataLg, color: C.amber }}>4.9★</div>
-            <div style={{ ...typeLabel, color: C.muted, marginTop: 4 }}>User Rating</div>
-          </div>
-        </div>
-
-        {/* How it works */}
-        <div style={{ marginTop: 48 }}>
-          <div style={{ ...typeLabel, marginBottom: 20 }}>
-            How it works
-          </div>
-          {[
-            { step: "1", title: "Fill in the deal", desc: "Add scope, price, and deadline. Takes under 60 seconds." },
-            { step: "2", title: "Sign & share", desc: "You sign first, then send a WhatsApp link to your client." },
-            { step: "3", title: "Client signs", desc: "They open the link, review, and sign on their phone." },
-            { step: "4", title: "Deal locked", desc: "A permanent, tamper-evident receipt is created for both parties." },
-          ].map(({ step, title, desc }, idx) => (
-            <div
-              key={step}
-              style={{
-                display: "flex",
-                gap: 16,
-                marginBottom: 20,
-                alignItems: "flex-start",
-                animation: "fadeSlideUp 0.2s ease forwards",
-                opacity: 0,
-                animationDelay: `${idx * 60}ms`,
-              }}
-            >
-              <div
-                style={{
-                  ...typeData,
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  background: C.navyMid,
-                  color: "#FFFFFF",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 700,
-                  flexShrink: 0,
-                }}
+            <motion.div variants={fadeIn} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-white/80 mb-8 backdrop-blur-sm">
+              <Zap className="w-4 h-4 text-gold" />
+              <span>For freelancers & small businesses</span>
+            </motion.div>
+            
+            <motion.h1 variants={fadeIn} className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-[1.1]">
+              Turn WhatsApp deals into <span className="text-gradient">signed proof</span> fast.
+            </motion.h1>
+            
+            <motion.p variants={fadeIn} className="text-lg text-white/60 mb-10 max-w-lg leading-relaxed">
+              Create a professional agreement in 60 seconds. Share on WhatsApp. Get it signed on mobile. Secure your work with a tamper-evident record.
+            </motion.p>
+            
+            <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4">
+              <button 
+                onClick={onStart}
+                className="group relative inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-[0_0_40px_rgba(99,102,241,0.4)] hover:shadow-[0_0_60px_rgba(99,102,241,0.6)] hover:-translate-y-0.5"
               >
-                {step}
-              </div>
-              <div>
-                <div style={{ ...typeBodyStrong, fontSize: 15, marginBottom: 2 }}>{title}</div>
-                <div style={typeBody}>{desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+                {t("Start for Free")}
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </motion.div>
+          </motion.div>
 
-        {/* Testimonial */}
-        <div style={{ marginTop: 48 }}>
-          <div style={{ ...typeLabel, marginBottom: 16 }}>What users say</div>
-          <div className="card-interactive" style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 20, boxShadow: C.shadowSm }}>
-            <div style={{ ...typeBody, fontStyle: "italic", color: C.ink, fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
-              "Handshake completely changed how I work. No more arguments over what was included in the price. The client signs on their phone before I even start."
-            </div>
-            <div>
-              <div style={{ ...typeBodyStrong, fontSize: 13 }}>Priya Sharma</div>
-              <div style={{ ...typeLabel, textTransform: "none", letterSpacing: "0", fontSize: 12 }}>Freelance Designer</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Dark Band */}
-        <div style={{ background: C.sectionBg, borderRadius: 16, padding: "32px 24px", marginTop: 48, textAlign: "center" }}>
-          <div style={{ fontFamily: C.sans, fontSize: 30, fontWeight: 700, color: C.ink, letterSpacing: "-0.6px" }}>
-            Your agreement.
-          </div>
-          <div style={{ fontFamily: C.sans, fontSize: 30, fontWeight: 700, color: C.amber, letterSpacing: "-0.6px", fontStyle: "italic", marginBottom: 12 }}>
-            Permanent.
-          </div>
-          <div style={{ ...typeBody, color: C.muted, marginBottom: 24 }}>
-            Stop relying on casual WhatsApp messages that get deleted. Get a proper, tamper-evident receipt.
-          </div>
-          <button
-            onClick={onStart}
-            style={{ ...primaryBtn, flex: "none", width: "100%" }}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative lg:ml-auto w-full max-w-md"
           >
-            {t("Start Free →")}
-          </button>
+            {/* Animated Product Preview Card */}
+            <div className="glass-panel p-6 relative z-10 overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary" />
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="font-semibold text-white/90">Deal #1042</div>
+                </div>
+                <div className="px-2 py-1 rounded-md bg-secondary/20 text-secondary text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                  <Lock className="w-3 h-3" /> Locked
+                </div>
+              </div>
+              
+              <div className="space-y-4 mb-6">
+                <div className="h-4 bg-white/5 rounded w-3/4 animate-pulse" />
+                <div className="h-4 bg-white/5 rounded w-1/2 animate-pulse" />
+              </div>
+              
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6">
+                <div className="text-sm text-white/50 mb-1">Agreed Price</div>
+                <div className="text-2xl font-bold text-gold">$1,250.00</div>
+              </div>
+              
+              <div className="flex items-center gap-3 p-3 bg-secondary/10 rounded-xl border border-secondary/20 text-secondary text-sm font-medium">
+                <CheckCircle2 className="w-5 h-5" />
+                Both parties signed
+              </div>
+            </div>
+            
+            {/* Decorative background cards */}
+            <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-[3rem] -z-10 opacity-50" />
+            <div className="absolute top-10 -right-6 w-full h-full glass-panel -z-10 opacity-40 rotate-6 translate-y-4" />
+          </motion.div>
         </div>
+      </section>
 
-        {/* Target users */}
-        <div style={{ marginTop: 48 }}>
-          <div style={{ ...typeLabel, marginBottom: 16 }}>
-            Built for
+      {/* 3. Pain/Problem Section */}
+      <section className="py-24 px-6 relative border-t border-white/5 bg-white/[0.01]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Stop working on a handshake.</h2>
+            <p className="text-white/60 text-lg max-w-2xl mx-auto">Informal WhatsApp chats lead to misunderstandings, scope creep, and unpaid invoices.</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          
+          <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: "👷", label: "Electricians" },
-              { icon: "📸", label: "Photographers" },
-              { icon: "☀️", label: "Solar installers" },
-              { icon: "💻", label: "Freelancers" },
-              { icon: "🎨", label: "Designers" },
-              { icon: "🏗️", label: "Contractors" },
-            ].map(({ icon, label }, idx) => (
-              <div
-                key={label}
-                className="card-interactive"
-                style={{
-                  background: C.card,
-                  border: `1px solid ${C.border}`,
-                  borderRadius: 12,
-                  padding: "12px 14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  ...typeBody,
-                  fontWeight: 500,
-                  color: C.ink,
-                  boxShadow: C.shadowSm,
-                  animation: "fadeSlideUp 0.2s ease forwards",
-                  opacity: 0,
-                  animationDelay: `${idx * 40}ms`,
-                }}
+              { title: "Scope Creep", desc: "\"Can you just add this one small thing?\"", icon: "🛑" },
+              { title: "Payment Confusion", desc: "\"I thought we agreed on a lower price?\"", icon: "💸" },
+              { title: "Lost Details", desc: "\"Where did we agree on the deadline?\"", icon: "📱" }
+            ].map((pain, i) => (
+              <motion.div 
+                key={i}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                variants={fadeIn}
+                className="glass-panel p-8"
               >
-                <span style={{ fontSize: 20 }}>{icon}</span> {label}
-              </div>
+                <div className="text-4xl mb-4">{pain.icon}</div>
+                <h3 className="text-xl font-semibold mb-2">{pain.title}</h3>
+                <p className="text-white/50 italic">"{pain.desc}"</p>
+              </motion.div>
             ))}
           </div>
         </div>
+      </section>
 
-        <p style={{ textAlign: "center", fontSize: 12, color: C.muted, marginTop: 36 }}>
-          No account needed. No subscription.
-        </p>
-      </div>
+      {/* 4. How it Works Section */}
+      <section className="py-24 px-6 relative">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">How it works</h2>
+            <p className="text-white/60 text-lg">Four simple steps to peace of mind.</p>
+          </div>
+          
+          <div className="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
+            {[
+              { step: "01", title: "Create Deal", desc: "Define the scope, price, and timeline in seconds.", align: "left" },
+              { step: "02", title: "Send Link", desc: "Share the unique deal link directly via WhatsApp or email.", align: "right" },
+              { step: "03", title: "Client Signs", desc: "They review and sign on their phone. No app needed.", align: "left" },
+              { step: "04", title: "Agreement Locks", desc: "A tamper-evident receipt is generated for both parties.", align: "right" },
+            ].map((item, i) => (
+              <motion.div 
+                key={i}
+                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
+                variants={fadeIn}
+                className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active`}
+              >
+                {/* Timeline dot */}
+                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-bg bg-primary text-white shadow shadow-primary/40 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 relative z-10 font-bold text-sm">
+                  {item.step}
+                </div>
+                
+                {/* Card */}
+                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] glass-panel p-6 group-hover:-translate-y-1 transition-transform">
+                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-white/60">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Trust/Value Section */}
+      <section className="py-24 px-6 bg-white/[0.02] border-y border-white/5">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-6 leading-tight">Built for speed.<br/>Designed for trust.</h2>
+            <p className="text-lg text-white/60 mb-8">We removed all the friction so you can focus on the work, not the paperwork.</p>
+            
+            <div className="space-y-4">
+              {[
+                { icon: Smartphone, text: "Mobile-first experience" },
+                { icon: Zap, text: "No login or app install required" },
+                { icon: Lock, text: "Cryptographically locked records" },
+                { icon: Shield, text: "Neutral third-party verification" }
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 text-white/80">
+                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+                    <item.icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="font-medium">{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4 mt-8">
+              <div className="glass-panel p-6 text-center">
+                <div className="text-3xl font-bold text-gold mb-2">10k+</div>
+                <div className="text-sm text-white/60">Deals Signed</div>
+              </div>
+              <div className="glass-panel p-6 text-center bg-primary/5 border-primary/20">
+                <Shield className="w-8 h-8 text-primary mx-auto mb-3" />
+                <div className="font-medium">Bank-grade Security</div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="glass-panel p-6 text-center">
+                <div className="text-3xl font-bold text-white mb-2">4.9/5</div>
+                <div className="text-sm text-white/60">User Rating</div>
+              </div>
+              <div className="glass-panel p-6 text-center">
+                <CheckCircle2 className="w-8 h-8 text-secondary mx-auto mb-3" />
+                <div className="font-medium">100% Verified</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Pricing Teaser */}
+      <section className="py-24 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">Simple, transparent pricing.</h2>
+          <p className="text-white/60 mb-12">Start for free, upgrade when you need to.</p>
+          
+          <div className="glass-panel p-8 relative overflow-hidden text-left flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-[80px] pointer-events-none" />
+            
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/10 text-gold text-sm font-medium mb-4">
+                Current Plan
+              </div>
+              <h3 className="text-2xl font-bold mb-2">Free Tier</h3>
+              <p className="text-white/60">Perfect for small projects and individual freelancers.</p>
+              
+              <ul className="mt-6 space-y-2">
+                {["Unlimited deals", "Digital signatures", "WhatsApp sharing"].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-white/80">
+                    <Check className="w-4 h-4 text-secondary" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="text-center md:text-right shrink-0">
+              <div className="text-4xl font-bold text-white mb-1">$0<span className="text-lg text-white/40 font-normal">/mo</span></div>
+              <div className="text-sm text-white/60 mb-6">No credit card required</div>
+              <button onClick={onStart} className="bg-white text-bg px-6 py-3 rounded-lg font-bold hover:bg-white/90 transition-colors w-full md:w-auto">
+                Start Creating
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Final CTA */}
+      <section className="py-32 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary/5" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px] opacity-40 pointer-events-none" />
+        
+        <div className="relative max-w-4xl mx-auto text-center z-10">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6">Ready to close deals professionally?</h2>
+          <p className="text-xl text-white/60 mb-10 max-w-2xl mx-auto">
+            Stop relying on casual messages. Get proper, tamper-evident receipts for every job.
+          </p>
+          <button 
+            onClick={onStart}
+            className="group inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:shadow-[0_0_60px_rgba(99,102,241,0.5)] hover:-translate-y-1"
+          >
+            Start for Free Now
+            <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          </button>
+          
+          <div className="mt-8 text-sm text-white/40">
+            Takes 60 seconds • No account needed
+          </div>
+        </div>
+      </section>
+      
+      {/* Footer / Meta */}
+      <footer className="border-t border-white/5 py-8 px-6 text-center text-white/30 text-sm">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span>🤝</span> Handshake
+          </div>
+          <div>© {new Date().getFullYear()} Handshake. All rights reserved.</div>
+        </div>
+      </footer>
     </div>
   );
 }
