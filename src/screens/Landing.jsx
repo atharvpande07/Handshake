@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Shield, Zap, Smartphone, Lock, Play, FileText, Check, ChevronDown, Heart, MessageCircle, Users } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Shield, Zap, Smartphone, Lock, Check, ChevronDown, Heart, MessageCircle, Users } from 'lucide-react';
 
 export default function Landing({ onStart, t, language, toggleLanguage, onDashboard }) {
   const fadeIn = {
@@ -27,10 +27,10 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
         {/* Background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[120px] opacity-50 pointer-events-none" />
         
-        <div className="relative grid lg:grid-cols-2 gap-16 lg:gap-8 items-center">
+        <div className="relative flex items-center justify-center">
           <motion.div 
             initial="hidden" animate="visible" variants={staggerContainer}
-            className="max-w-2xl"
+            className="max-w-3xl text-center"
           >
             <motion.div variants={fadeIn} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-white/80 mb-8 backdrop-blur-sm">
               <Zap className="w-4 h-4 text-gold" />
@@ -41,11 +41,11 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
               Before starting work,  <span className="text-gradient">Get it</span> Signed
             </motion.h1>
             
-            <motion.p variants={fadeIn} className="text-lg text-white/60 mb-10 max-w-lg leading-relaxed">
+            <motion.p variants={fadeIn} className="text-lg text-white/60 mb-10 max-w-xl mx-auto leading-relaxed">
               Create a professional agreement in 60 seconds. Share on WhatsApp. Get it signed on mobile. Your agreement is Secured after signing — everyone keeps a clear record.
             </motion.p>
             
-            <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4">
+            <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
                 onClick={onStart}
                 className="group relative inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-[0_0_40px_rgba(99,102,241,0.4)] hover:shadow-[0_0_60px_rgba(99,102,241,0.6)] hover:-translate-y-0.5"
@@ -54,48 +54,10 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </motion.div>
-          </motion.div>
 
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative lg:ml-auto w-full max-w-md"
-          >
-            {/* Animated Product Preview Card */}
-            <div className="glass-panel p-6 relative z-10 overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary" />
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="font-semibold text-white/90">Deal #1042</div>
-                </div>
-                <div className="px-2 py-1 rounded-md bg-secondary/20 text-secondary text-xs font-bold uppercase tracking-wider flex items-center gap-1">
-                  <Lock className="w-3 h-3" /> Locked
-                </div>
-              </div>
-              
-              <div className="space-y-4 mb-6">
-                <div className="h-4 bg-white/5 rounded w-3/4 animate-pulse" />
-                <div className="h-4 bg-white/5 rounded w-1/2 animate-pulse" />
-              </div>
-              
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6">
-                <div className="text-sm text-white/50 mb-1">Agreed Price</div>
-                <div className="text-2xl font-bold text-gold">$1,250.00</div>
-              </div>
-              
-              <div className="flex items-center gap-3 p-3 bg-secondary/10 rounded-xl border border-secondary/20 text-secondary text-sm font-medium">
-                <CheckCircle2 className="w-5 h-5" />
-                Both parties signed
-              </div>
-            </div>
-            
-            {/* Decorative background cards */}
-            <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-[3rem] -z-10 opacity-50" />
-            <div className="absolute top-10 -right-6 w-full h-full glass-panel -z-10 opacity-40 rotate-6 translate-y-4" />
+            <motion.div variants={fadeIn} className="mt-8 text-sm text-white/40">
+              One-time purchase • No app needed for clients
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -203,10 +165,11 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
             
             <div className="space-y-4">
               {[
-                { icon: Smartphone, text: "Mobile-first experience" },
-                { icon: Zap, text: "No login or app install required for client" },
-                { icon: Lock, text: "Your agreement is cryptographically locked after signing" },
-                { icon: Shield, text: "Any changes after signing are visible" }
+                { icon: CheckCircle2, text: "Know exactly what was agreed" },
+                { icon: Shield, text: "Avoid revision fights" },
+                { icon: Lock, text: "Prevent payment confusion" },
+                { icon: Smartphone, text: "Mobile-first — no app needed for clients" },
+                { icon: Zap, text: "Your agreement is locked after signing" }
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 text-white/80">
                   <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
@@ -271,7 +234,8 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
             
             <div className="text-center md:text-right shrink-0">
               <div className="text-4xl font-bold text-white mb-1">₹4,499</div>
-              <div className="text-sm text-white/60 mb-6">One-time payment • No recurring fees</div>
+              <div className="text-sm text-white/60 mb-2">One-time payment • No recurring fees</div>
+              <div className="text-xs text-gold/80 italic mb-6">One unpaid project can cost more than Handshake.</div>
               <button onClick={onStart} className="bg-white text-bg px-6 py-3 rounded-lg font-bold hover:bg-white/90 transition-colors w-full md:w-auto">
                 Get Handshake
               </button>
@@ -370,15 +334,18 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
                 <Heart className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white/90 mb-3">Founder: Why I built this?</h3>
+                <h3 className="text-lg font-bold text-white/90 mb-3">Why Handshake exists</h3>
                 <p className="text-white/55 leading-relaxed text-[15px] mb-3">
-                  Built after seeing how often WhatsApp deals get messy — someone changes the scope, forgets the price, or just ghosts. I needed a simple way to lock in work before starting, without making the client jump through hoops.
+                  Handshake was built after seeing too many freelancers lose money from unclear WhatsApp agreements.
+                </p>
+                <p className="text-white/55 leading-relaxed text-[15px] mb-3">
+                  Most projects don't start with contracts. They start with chats, voice notes, and "bro trust me."
                 </p>
                 <p className="text-white/55 leading-relaxed text-[15px]">
-                  Handshake is made for people who need a quick, clear agreement they can send in a chat and get signed on a phone. Nothing more, nothing less.
+                  Handshake exists to make those deals clear before work begins.
                 </p>
                 <div className="mt-5 text-sm text-white/30 font-medium">
-                  — From one freelancer to another
+                  — Atharv, Founder
                 </div>
               </div>
             </div>
