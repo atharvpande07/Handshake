@@ -56,7 +56,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
             </motion.div>
 
             <motion.div variants={fadeIn} className="mt-8 text-sm text-white/40">
-              One-time purchase • No app needed for clients
+                  One-time purchase • No Recurring Fees
             </motion.div>
           </motion.div>
         </div>
