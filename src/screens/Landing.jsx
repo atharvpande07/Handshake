@@ -38,11 +38,11 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
             </motion.div>
             
             <motion.h1 variants={fadeIn} className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-[1.1]">
-              Before starting work,  <span className="text-gradient">Get it</span> Signed
+              Before starting work,  <span className="text-gradient">get it</span> signed
             </motion.h1>
             
             <motion.p variants={fadeIn} className="text-lg text-white/60 mb-10 max-w-xl mx-auto leading-relaxed">
-              Create a professional agreement in 60 seconds. Share on WhatsApp. Get it signed on mobile. Your agreement is Secured after signing — everyone keeps a clear record.
+              Create a professional agreement in 60 seconds. Share on WhatsApp. Get it signed on mobile. Your agreement is Locked after signing — everyone keeps a clear record.
             </motion.p>
             
             <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -160,7 +160,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
       <section className="py-24 px-6 bg-white/[0.02] border-y border-white/5">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-6 leading-tight">Built for speed.<br/>Designed for trust.</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-6 leading-tight">Clear agreements.<br/>Nothing misunderstood.</h2>
             <p className="text-lg text-white/60 mb-8">We removed all the friction so you can focus on the work, not the paperwork.</p>
             
             <div className="space-y-4">
@@ -223,7 +223,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
               <p className="text-white/60">Protect your Work, Time & Energy</p>
               
               <ul className="mt-6 space-y-2">
-                {["Unlimited deals", "Digital signatures", "WhatsApp sharing", "PDF downloads", "Locked agreement records"].map((feature, i) => (
+                {["Unlimited Deals", "Digital signatures", "WhatsApp sharing", "PDF downloads", "Agreement records locked forever"].map((feature, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-white/80">
                     <Check className="w-4 h-4 text-secondary" />
                     {feature}
