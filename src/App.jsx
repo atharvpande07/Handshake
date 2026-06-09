@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { C, typeBrand, typeLabel, ghostBtn, outlineBtn } from './constants/theme';
+import { C, typeBrand } from './constants/theme';
 import { TRANSLATIONS } from './constants/translations';
 import { genToken } from './utils/helpers';
 
@@ -311,50 +311,8 @@ export default function App() {
     ),
   };
 
-  const renderNavRight = () => {
-    if (screen === 'landing') {
-      return (
-        <button onClick={() => go("dashboard")} style={{ ...ghostBtn, color: "rgba(255,255,255,0.75)", fontSize: 12 }}>
-          My Deals →
-        </button>
-      );
-    }
-    if (screen === 'clientView') {
-      return (
-        <span
-          style={{
-            ...typeLabel,
-            color: C.amber,
-            background: "transparent",
-            border: `1px solid ${C.amber}`,
-            padding: "4px 10px",
-            borderRadius: 20,
-          }}
-        >
-          Deal Receipt
-        </span>
-      );
-    }
-    if (screen === 'receipt') {
-      return (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            background: C.green,
-            padding: "5px 14px",
-            borderRadius: 20,
-          }}
-        >
-          <span style={{ color: "#FFFFFF", fontSize: 12, fontWeight: 700, fontFamily: C.sans }}>
-            🔒 DEAL LOCKED
-          </span>
-        </div>
-      );
-    }
-    return null;
-  };
+
+
 
   return (
     <div
@@ -364,26 +322,7 @@ export default function App() {
         minHeight: "100vh",
       }}
     >
-      <nav
-        style={{
-          padding: "16px 24px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderBottom: `1px solid ${C.border}`,
-          background: C.navy,
-        }}
-      >
-        <div style={{ ...typeBrand, color: "#FFFFFF", display: "flex", alignItems: "center", gap: 8 }}>
-          <span>🤝</span> Handshake
-        </div>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <button onClick={toggleLanguage} style={{ ...outlineBtn, fontSize: 12, padding: "6px 14px", color: "#FFFFFF", borderColor: C.navyLight, background: "transparent" }}>
-            {language === "hi" ? "EN | हिंदी" : "हिंदी | EN"}
-          </button>
-          {renderNavRight()}
-        </div>
-      </nav>
+
       <div className="screen-root" key={screenKey}>
         {screens[screen] || screens.landing}
       </div>

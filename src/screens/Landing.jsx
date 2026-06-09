@@ -26,9 +26,9 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
       <section className="relative pt-20 pb-32 lg:pt-32 lg:pb-40 px-6 max-w-7xl mx-auto">
         {/* Background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[120px] opacity-50 pointer-events-none" />
-        
+
         <div className="relative flex items-center justify-center">
-          <motion.div 
+          <motion.div
             initial="hidden" animate="visible" variants={staggerContainer}
             className="max-w-3xl text-center"
           >
@@ -36,17 +36,17 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
               <Zap className="w-4 h-4 text-gold" />
               <span>For freelancers & small businesses</span>
             </motion.div>
-            
+
             <motion.h1 variants={fadeIn} className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-[1.1]">
               Before starting work,  <span className="text-gradient">get it</span> signed
             </motion.h1>
-            
+
             <motion.p variants={fadeIn} className="text-lg text-white/60 mb-10 max-w-xl mx-auto leading-relaxed">
               Create a professional agreement in 60 seconds. Share on WhatsApp. Get it signed on mobile. Your agreement is Locked after signing — everyone keeps a clear record.
             </motion.p>
-            
+
             <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
+              <button
                 onClick={onStart}
                 className="group relative inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-[0_0_40px_rgba(99,102,241,0.4)] hover:shadow-[0_0_60px_rgba(99,102,241,0.6)] hover:-translate-y-0.5"
               >
@@ -56,7 +56,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
             </motion.div>
 
             <motion.div variants={fadeIn} className="mt-8 text-sm text-white/40">
-                  One-time purchase • No Recurring Fees
+              One-time purchase • No Recurring Fees
             </motion.div>
           </motion.div>
         </div>
@@ -81,7 +81,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
               Every freelancer has heard these. Each one has cost you money.
             </motion.p>
           </div>
-          
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-14">
             {[
               { quote: "We need this by next week, but it's super simple.", tag: "The Undervaluer" },
@@ -91,7 +91,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
               { quote: "As soon as my client pays me, I'll pay you.", tag: "The Chain Delayer" },
               { quote: "I thought we agreed on a lower price?", tag: "The Renegotiator" },
             ].map((pain, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial="hidden" whileInView="visible" viewport={{ once: true }}
                 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: i * 0.08 } } }}
@@ -126,7 +126,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">How it works</h2>
             <p className="text-white/60 text-lg">Four simple steps to peace of mind.</p>
           </div>
-          
+
           <div className="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
             {[
               { step: "01", title: "Create Deal", desc: "Define the scope, price, and timeline in seconds.", align: "left" },
@@ -134,7 +134,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
               { step: "03", title: "Client Signs", desc: "They review and sign on their phone. No app needed.", align: "left" },
               { step: "04", title: "Agreement Locks", desc: "Both sides get the same final copy. Any changes after signing are visible.", align: "right" },
             ].map((item, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
                 variants={fadeIn}
@@ -144,7 +144,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-bg bg-primary text-white shadow shadow-primary/40 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 relative z-10 font-bold text-sm">
                   {item.step}
                 </div>
-                
+
                 {/* Card */}
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] glass-panel p-6 group-hover:-translate-y-1 transition-transform">
                   <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
@@ -160,9 +160,9 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
       <section className="py-24 px-6 bg-white/[0.02] border-y border-white/5">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-6 leading-tight">Clear agreements.<br/>Nothing misunderstood.</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-6 leading-tight">Clear agreements.<br />Nothing misunderstood.</h2>
             <p className="text-lg text-white/60 mb-8">We removed all the friction so you can focus on the work, not the paperwork.</p>
-            
+
             <div className="space-y-4">
               {[
                 { icon: CheckCircle2, text: "Know exactly what was agreed" },
@@ -180,7 +180,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
               ))}
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-4 mt-8">
               <div className="glass-panel p-6 text-center">
@@ -211,19 +211,19 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Simple, transparent pricing</h2>
           <p className="text-white/60 mb-12">Onetime Purchase & Yours forever</p>
-          
+
           <div className="glass-panel p-8 relative overflow-hidden text-left flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-[80px] pointer-events-none" />
-            
+
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/10 text-gold text-sm font-medium mb-4">
                 One-Time Purchase
               </div>
               <h3 className="text-2xl font-bold mb-2">Handshake</h3>
               <p className="text-white/60">Protect your Work, Time & Energy</p>
-              
+
               <ul className="mt-6 space-y-2">
-                {["Unlimited Deals", "Digital signatures", "WhatsApp sharing", "PDF downloads", "Agreement records locked forever"].map((feature, i) => (
+                {["Unlimited Deals", "Digital signatures", "Agreement records locked forever",].map((feature, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-white/80">
                     <Check className="w-4 h-4 text-secondary" />
                     {feature}
@@ -231,7 +231,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
                 ))}
               </ul>
             </div>
-            
+
             <div className="text-center md:text-right shrink-0">
               <div className="text-4xl font-bold text-white mb-1">₹4,499</div>
               <div className="text-sm text-white/60 mb-2">One-time payment • No recurring fees</div>
@@ -263,7 +263,7 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
               Quick answers to what people ask most.
             </motion.p>
           </div>
-          
+
           <div className="space-y-3">
             {[
               {
@@ -339,10 +339,10 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
                   Handshake was built after seeing too many freelancers lose money from unclear WhatsApp agreements.
                 </p>
                 <p className="text-white/55 leading-relaxed text-[15px] mb-3">
-                  Most projects don't start with contracts. They start with chats, voice notes, and "bro trust me."
+                  Most projects don't start with contracts. They start with chats, voice notes, and "You can trust me".
                 </p>
                 <p className="text-white/55 leading-relaxed text-[15px]">
-                  Handshake exists to make those deals clear before work begins.
+                  Handshake exists to make those deals clearer  before work begins.
                 </p>
                 <div className="mt-5 text-sm text-white/30 font-medium">
                   — Atharv, Founder
@@ -357,26 +357,26 @@ export default function Landing({ onStart, t, language, toggleLanguage, onDashbo
       <section className="py-32 px-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/5" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px] opacity-40 pointer-events-none" />
-        
+
         <div className="relative max-w-4xl mx-auto text-center z-10">
           <h2 className="text-4xl lg:text-5xl font-bold mb-6">Ready to close deals professionally?</h2>
           <p className="text-xl text-white/60 mb-10 max-w-2xl mx-auto">
             Stop relying on casual messages. Get a clear, signed record for every job.
           </p>
-          <button 
+          <button
             onClick={onStart}
             className="group inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:shadow-[0_0_60px_rgba(99,102,241,0.5)] hover:-translate-y-1"
           >
             Get Handshake — ₹4,499
             <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </button>
-          
+
           <div className="mt-8 text-sm text-white/40">
             One-time purchase • No subscription
           </div>
         </div>
       </section>
-      
+
       {/* Footer / Meta */}
       <footer className="border-t border-white/5 py-8 px-6 text-center text-white/30 text-sm">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
